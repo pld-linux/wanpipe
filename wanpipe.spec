@@ -3,7 +3,7 @@ Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.3.0
 %define	subver	9
-Release:	%{subver}.1
+Release:	%{subver}.2
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
@@ -45,6 +45,9 @@ Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 %patch1 -p1
 
 ln -sf . patches/kdrivers/include/linux
+
+# hack to omit searching libncurses.so in somedirs/lib
+touch util/lxdialog/ncurses
 
 %build
 %{__make} -C util \

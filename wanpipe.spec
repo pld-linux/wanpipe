@@ -15,6 +15,7 @@ Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-ncurses.patch
 URL:		http://www.freeciv.org/
+Buildrequires:	ncurses-devel >= 5.2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/wanpipe
@@ -57,9 +58,8 @@ cd ../../lxdialog
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
-install -d $RPM_BUILD_ROOT/{%{_sbindir},%{_libdir}/wanrouter/{firmware,config/wancfg,config/ft1}}
-install -d $RPM_BUILD_ROOT/{/var/log,%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
+install -d $RPM_BUILD_ROOT/{%{_sbindir},%{_libdir}/wanrouter/{firmware,config/wancfg,config/ft1}} \
+	$RPM_BUILD_ROOT/{/var/log,%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
 
 install util/bin/* $RPM_BUILD_ROOT%{_sbindir}
 install firmware/* $RPM_BUILD_ROOT%{_libdir}/wanrouter/firmware

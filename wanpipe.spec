@@ -1,16 +1,18 @@
 Summary:	WAN routing package for Sangoma cards
+Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.1.3
 Release:	1
 License:	GPL
-Group:		Utilities/System
-Group(pl):	Narzêdzia/System
+Group:		Applications/System
+Group(de):	Applikationen/System
+Group(pl):	Aplikacje/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
-Source3:	wanpipe1.conf
-Patch0:		wanpipe-cfgtools.patch
-Patch1:		wanpipe-opt.patch
+Source3:	%{name}1.conf
+Patch0:		%{name}-cfgtools.patch
+Patch1:		%{name}-opt.patch
 URL:		http://www.freeciv.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -21,8 +23,10 @@ Multi-protocol WANPIPE Driver utilities for Linux Operating System.
 
 %package cfgtools
 Summary:	Configuration tools for wanpipe
-Group:		Utilities/System
-Group(pl):	Narzêdzia/System
+Summary(pl):	Narzêdzia konfiguracyjne do wanpipe
+Group:		Applications/System
+Group(de):	Applikationen/System
+Group(pl):	Aplikacje/System
 Requires:	%{name} = %{version}
 
 %description cfgtools
@@ -32,12 +36,12 @@ Menu-driven configuration tools for WANPIPE.
 %setup -qn usr/local/wanrouter
 %patch0 -p1
 %patch1 -p1
-rm util/bin/*
-rm config/ft1/source/ft1_exec
-rm config/lxdialog/lxdialog
+rm -f util/bin/*
+rm -f config/ft1/source/ft1_exec
+rm -f config/lxdialog/lxdialog
 
 %build
-OPTFLAGS="$RPM_OPT_FLAGS"
+OPTFLAGS="%{rpmcflags}"
 export OPTFLAGS
 
 cd util

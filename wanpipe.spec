@@ -1,7 +1,6 @@
-# $Revision $, $Date $
 Summary:	WAN routing package for Sangoma cards
 Name:		wanpipe
-Version:	2.1.1
+Version:	2.1.3
 Release:	1
 License:	GPL
 Group:		Utilities/System
@@ -10,37 +9,66 @@ Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	wanpipe1.conf
+Patch0:		wanpipe-cfgtools.patch
+Patch1:		wanpipe-opt.patch
 URL:		http://www.freeciv.org/
-Requires:	kernel >= 2.2.14
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/wanpipe
+
 %description
 Multi-protocol WANPIPE Driver utilities for Linux Operating System.
 
+%package cfgtools
+Summary:        Configuration tools for wanpipe
+Group:          Utilities/System
+Group(pl):      Narzêdzia/System
+Requires:       %{name} = %{version}
+
+%description cfgtools
+Menu-driven configuration tools for WANPIPE.
+
 %prep
-%setup -qn usr/lib/wanrouter
-rm -f src/bin/*
+%setup -qn usr/local/wanrouter
+%patch0 -p1
+%patch1 -p1
+rm util/bin/*
+rm config/ft1/source/ft1_exec
+rm config/lxdialog/lxdialog
 
 %build
-cd src
+OPTFLAGS="$RPM_OPT_FLAGS"
+export OPTFLAGS
+
+cd util
 make OUTDIR=bin
+
+cd ../config/ft1/source
+make
+
+cd ../../lxdialog
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/wanrouter/wanpipe,/var/log} \
-	$RPM_BUILD_ROOT{%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
+install -d $RPM_BUILD_ROOT/{%{_sbindir},%{_libdir}/wanrouter/{firmware,config/wancfg,config/ft1}}
+install -d $RPM_BUILD_ROOT/{/var/log,%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
 
-install src/bin/* $RPM_BUILD_ROOT/%{_sbindir}
-install wanpipe/* $RPM_BUILD_ROOT/%{_libdir}/wanrouter/wanpipe
+install util/bin/* $RPM_BUILD_ROOT%{_sbindir}
+install firmware/* $RPM_BUILD_ROOT%{_libdir}/wanrouter/firmware
+install config/lxdialog/lxdialog  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config
+install config/wancfg/wancfg  $RPM_BUILD_ROOT%{_sbindir}
+install config/wancfg/lib/*  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/wancfg
+install config/ft1/cfgft1 $RPM_BUILD_ROOT%{_sbindir}
+install config/ft1/source/{ft1_exec,ft1_print}  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/ft1
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 
 touch $RPM_BUILD_ROOT/var/log/wanrouter
 
-gzip -9nf README doc/* samples/* || :
+gzip -9nf README samples/* || :
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -65,11 +93,19 @@ fi
 
 %files 
 %defattr(644,root,root,755)
-%doc README.gz doc/*.gz samples/*.gz
-%dir %{_sysconfdir}/wanpipe
+%doc README.gz doc/* samples/*.gz
+%dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/wanrouter
 %attr(754,root,root) /etc/rc.d/init.d/wanrouter
 %attr(755,root,root) %{_sbindir}/*
-%{_libdir}/wanrouter
+%attr(755,root,root) %dir %{_libdir}/wanrouter
+%{_libdir}/wanrouter/firmware
 %attr(640,root,root) %ghost /var/log/wanrouter
+
+%files cfgtools
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/wanrouter/config/lxdialog
+%attr(755,root,root) %dir %{_libdir}/wanrouter/config/ft1
+%attr(755,root,root) %{_libdir}/wanrouter/config/ft1/*
+%{_libdir}/wanrouter/config/wancfg

@@ -1,0 +1,36 @@
+diff -durN wanrouter.orig/config/ft1/source/Makefile wanrouter/config/ft1/source/Makefile
+--- wanrouter.orig/config/ft1/source/Makefile	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/ft1/source/Makefile	Wed May  3 12:02:32 2000
+@@ -15,7 +15,7 @@
+ VPATH  = $(SYSINC)
+ 
+ # Tools options.
+-CFLAGS  = -Wall -O2 -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
++CFLAGS  = -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
+ LIBS = -lncurses
+ 
+ ####### RULES ################################################################
+diff -durN wanrouter.orig/config/lxdialog/Makefile wanrouter/config/lxdialog/Makefile
+--- wanrouter.orig/config/lxdialog/Makefile	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/lxdialog/Makefile	Wed May  3 12:03:09 2000
+@@ -1,7 +1,7 @@
+ CC = gcc 
+ CPP = gcc -E
+ 
+-CFLAGS = -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -DLOCALE 
++CFLAGS = -Wall -Wstrict-prototypes $(OPTFLAGS) -DLOCALE 
+ LDFLAGS = -s -L .
+ LDLIBS = -lncurses
+ 
+diff -durN wanrouter.orig/util/Makefile wanrouter/util/Makefile
+--- wanrouter.orig/util/Makefile	Thu Apr  6 23:56:32 2000
++++ wanrouter/util/Makefile	Wed May  3 12:02:04 2000
+@@ -17,7 +17,7 @@
+ VPATH	= $(SYSINC)
+ 
+ # Tools options.
+-CFLAGS	= -Wall -O2 -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
++CFLAGS	= -Wall $(OPTFLAGS) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
+ 
+ ####### RULES ################################################################
+ 

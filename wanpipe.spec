@@ -3,7 +3,7 @@ Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.3.0
 %define	subver	9
-Release:	%{subver}.2
+Release:	%{subver}.3
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
@@ -13,6 +13,7 @@ Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
 Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
+Patch2:		%{name}-bins_sh.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	ncurses-devel >= 5.2
 PreReq:		rc-scripts
@@ -43,6 +44,7 @@ Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 %setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p0
 
 ln -sf . patches/kdrivers/include/linux
 

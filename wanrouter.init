@@ -90,14 +90,14 @@ router_load()
 		mod_error $MOD1
 		return 1
 	fi
-        if [ ! -f "$MOD2" ]; then
+	if [ ! -f "$MOD2" ]; then
 		mod_error $MOD2 
-                return 1
-        fi           
-        if [ ! -f "$MOD3" ]; then
+		return 1
+	fi	   
+	if [ ! -f "$MOD3" ]; then
 		mod_error $MOD3 
-                return 1
-        fi          
+		return 1
+	fi
 
 	wansock_config CHECK
 	if [ $? -eq 1 ]; then
@@ -110,7 +110,7 @@ router_load()
 		echo -e "   WAN_DRIVERS must be set to wanpipe\n"
 		echo -e "   wanrouter start failed !!!\n" 
 		return 1
-  	}
+	}
 
 	show "Loading WAN drivers: " ; started
 	for i in $WAN_DRIVERS
@@ -168,11 +168,11 @@ router_unload()
 mod_error()
 {
 	echo -e "\n"
-        error "Wanpipe Module: $1 not found !!!"
-        echo -e "        WANPIPE drivers must be compiled as modules"
-        echo -e "        Check kernel configuration in /usr/src/linux/.config: "
-        echo -e "             CONFIG_WAN_ROUTER=m"
-        echo -e "             CONFIG_VENDOR_SANGOMA=m\n"               
+	error "Wanpipe Module: $1 not found !!!"
+	echo -e "        WANPIPE drivers must be compiled as modules"
+	echo -e "        Check kernel configuration in /usr/src/linux/.config: "
+	echo -e "             CONFIG_WAN_ROUTER=m"
+	echo -e "             CONFIG_VENDOR_SANGOMA=m\n"
 }
 
 check_config()
@@ -210,7 +210,7 @@ print_active_devices()
 	echo -en "\t" 
 
 	#If /proc directory doesn't exist nothing
-        #to print, thus exit
+	#to print, thus exit
 	[ ! -d "$ROUTER_PROC" ] && return 0 
 
 	cd $ROUTER_PROC
@@ -368,8 +368,8 @@ check_config_opt ()
 		result "ft1" 
 
 		#Get the wanpipe device number, and return it
-                #as a return code. This indicates that we want
-                #to setup ft1 device
+		#as a return code. This indicates that we want
+		#to setup ft1 device
 		dev=${dev##wanpipe}
 		check_bash
 		if [ $? -gt 1 ]; then
@@ -481,222 +481,207 @@ ROUTER_LOG=${ROUTER_LOG:=/var/log/wanrouter}
 ROUTER_LOCK=${ROUTER_LOCK:=/var/lock/subsys/wanrouter}
 WAN_DEVICES=${WAN_DEVICES:="wanpipe1"}
 
+
 # See how we were called.
 case "$1" in
-	start)	
-		# ROUTER START
-		if [ -z $2 ]; then	
-
-			check_config || exit 1
-
-			[ -f "$ROUTER_LOCK" ] && {
-				echo -e "Router is already running. Stop it first!\n"
-				exit 1
-			}
-			router_load && touch $ROUTER_LOCK
-
-			for dev in $WAN_DEVICES; do
-				[ ! -e "$ROUTER_PROC/$dev" ] && {
-					echo -e "Error: Device $dev is not supported by kernel\n"
-					exit 1
-				}
-				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-				show "Starting up device: $dev" ; busy
-				echo "Starting up device: $dev" >> $ROUTER_LOG
-				router_config $ROUTER_CONF
-				deltext ; ok
-			done
-		else
-		#ROUTER START WANPIPE
-
-			[ -f $WANPIPE_CONF_DIR/$FT1_CONF ] && rm -f $WANPIPE_CONF_DIR/$FT1_CONF
-			dev=$2
-
-			#Parse the dev name, and if it starts with
-			#ft1 than it means we should load the ft1 
- 			#driver.  
-			check_config_opt $dev 0
-			ft1_or_wanpipe=$?
-			dev=$($GET_RC)
-			rm -f $RC
-
-			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-
-			check_file $ROUTER_CONF || exit 1
-
-			[ ! -f "$ROUTER_LOCK" ] && {
-				router_load && touch $ROUTER_LOCK
-			}	
-
-			#If we are starting FT1 driver, we have to check
-			#wether the actual wanpipe# device is running or
-                        #not, thus name dev has to be changed to 'wanpipe#'
-			if [ $ft1_or_wanpipe -gt 0 ]; then
-				dev="wanpipe$ft1_or_wanpipe"
-			fi 
-
-			res=`grep "Device is not configured" $ROUTER_PROC/$dev 2> /dev/null`
-			if [ -z "$res" ]; then
-				echo "Device $dev is still running"
-				echo -e "Run wanrouter stop $dev first\n"
-				exit 1
-			fi
-		
-			#Since we changed the name of dev above,
-			#we must check if we are running ft1 device,
-                        #output a correct message	
-			if [ $ft1_or_wanpipe -gt 0 ]; then
-				show "Starting up device: $dev, FT1 config mode" ; busy
-				echo "Starting up device: $dev, FT1 config mode" >> $ROUTER_LOG
-			else
-				show "Starting up device: $dev" ; busy
-				echo "Starting up device: $dev" >> $ROUTER_LOG
-			fi
-			router_config $ROUTER_CONF
-			if [ $? -ne 0 ]; then
-				deltext; fail
-				exit 3
-			fi
-			
-			#When loading ft1 device there are not interfaces
-			if [ $ft1_or_wanpipe -eq 0 ]; then
-				interf_config $dev $ROUTER_CONF
-				if [ $? -ne 0 ]; then
-					deltext; fail
-					exit 4
-				fi
-			fi
-			deltext; ok
-		fi
-		;;
-	stop)	
-		
-		#WANROUTER STOP
-		if [ -z $2 ]; then
-
-			#Check that all wanpipe#.conf file defined in 
-			# WAN_DEVICES exist
-			check_config || exit 1
-
-			[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
-				router_unload
-				echo -e "Router is already stopped !\n"
-				exit 1
-			}
-
-			#Stop all interfaces, but check whether 
-                        #device is running first
-			for dev in $WAN_DEVICES; do
-				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-				check_running $dev || exit 1
-			done
-
-			#Stop all routers but check if device
-			#is running first
-			for dev in $WAN_DEVICES; do
-				check_running $dev || continue
-				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-				show "Shutting down device: $dev" ; busy
-				echo "Shutting down device: $dev" >> $ROUTER_LOG
-				router_unconfig $ROUTER_CONF
-				deltext; ok
-			done
-
-
-			#Check if any devices are still running
-			#  If YES: don't unload the modules, just printout
-			#	   the list of active devices
-			#  If NO:  unload modules
-			check_and_print_still_running && exit 0
-
-			echo -e "No devices running, Unloading Modules"
-			router_unload
-
-		else
-		#WANROUTER STOP WANPIPE
-
-			dev=$2
-			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-
-			check_config_opt $dev 1
-			ft1_or_wanpipe=$?
-			dev=$($GET_RC)
-			rm -f $RC
-
-			#Check that all configuration files exist
-			check_file $ROUTER_CONF || exit 1
-
-			#Check that modules are up and running
-			[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
-				router_unload
-				echo -e "Router is already stopped !\n";
-				exit 1;
-			}
-
-			#If we are stopping FT1 driver, we have to check
-			#wheter the actual wanpipe# device is running or
-                        #not, thus name dev has to be changed to 'wanpipe#'
-			if [ $ft1_or_wanpipe -gt 0 ]; then
-				dev="wanpipe$ft1_or_wanpipe"
-			fi 
-
-			#Check that device is running first
-			if [ $ft1_or_wanpipe -eq 0 ]; then
-				check_running $dev || {
-						echo -e "Error: Device $dev is already stopped\n"
-						exit 0;
-					}
-			fi
-
-			if [  $ft1_or_wanpipe -gt 0 ]; then
-				show "Shutting down device: $dev, FT1 config mode" ; busy
-				echo "Shutting down device: $dev, FT1 config mode" >> $ROUTER_LOG
-			else	
-				show "Shutting down device: $dev" ; busy
-				echo "Shutting down device: $dev" >> $ROUTER_LOG
-			fi
-			
-			[ -f $WANPIPE_CONF_DIR/$FT1_CONF ] && rm -f $WANPIPE_CONF_DIR/$FT1_CONF
-			
-			router_unconfig $ROUTER_CONF
-			deltext ; ok
-
-			#Check if any devices are still running
-			#  If YES: don't unload the modules, just printout
-			#	   the list of active devices
-			#  If NO:  unload modules
-	
-			check_and_print_still_running && exit 0
-
-			cd $ROUTER_HOME
-			echo -e "No devices running, Unloading Modules"
-			router_unload
-
-		fi			
-		;;
-	list|status)
-		
-		[ -f "$ROUTER_LOCK" ] || {
-				echo -e "Router is stopped !\n";
-				exit 0;
+  start)	
+	# ROUTER START
+	if [ -z $2 ]; then	
+		check_config || exit 1
+		[ -f "$ROUTER_LOCK" ] && {
+			echo -e "Router is already running. Stop it first!\n"
+			exit 1
 		}
-		
-		echo -e "Devices currently active:"
-		print_active_devices;
-		exit 0;
+		router_load && touch $ROUTER_LOCK
+		for dev in $WAN_DEVICES; do
+			[ ! -e "$ROUTER_PROC/$dev" ] && {
+				echo -e "Error: Device $dev is not supported by kernel\n"
+				exit 1
+			}
+			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+			show "Starting up device: $dev" ; busy
+			echo "Starting up device: $dev" >> $ROUTER_LOG
+			router_config $ROUTER_CONF
+			ok
+		done
+	else
+		#ROUTER START WANPIPE
+		[ -f $WANPIPE_CONF_DIR/$FT1_CONF ] && rm -f $WANPIPE_CONF_DIR/$FT1_CONF
+		dev=$2
 
-		;;
-	*)	echo -e "\nWAN Router startup script"
-		echo -e "Usage: $SCRIPT: {start|stop} <wanpipe#> optional\n"
-		echo -e "       wanrouter start : Starts all devices specified in"
-		echo -e "                      $ROUTER_RC WAN_DEVICES\n"
-		echo -e "       wanrouter stop  : Stops all devices specified in"
-		echo -e "                      $ROUTER_RC WAN_DEVICES\n"
-		echo -e "       wanrouter start wanpipe# : Starts only device wanpipe#\n"
-		echo -e "       wanrouter stop wanpipe#  : Stops only device wanpipe#" 
-		echo -e "                               (# can range from 1 to 16)\n"
-		echo -e " 	wanrouter status : List all active devices\n"
-		exit 1
-		;;
+		#Parse the dev name, and if it starts with
+		#ft1 than it means we should load the ft1 
+		#driver.  
+
+		check_config_opt $dev 0
+		ft1_or_wanpipe=$?
+		dev=$($GET_RC)
+		rm -f $RC
+		ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+		check_file $ROUTER_CONF || exit 1
+		[ ! -f "$ROUTER_LOCK" ] && {
+			router_load && touch $ROUTER_LOCK
+		}	
+
+		#If we are starting FT1 driver, we have to check
+		#wether the actual wanpipe# device is running or
+		#not, thus name dev has to be changed to 'wanpipe#'
+
+		if [ $ft1_or_wanpipe -gt 0 ]; then
+			dev="wanpipe$ft1_or_wanpipe"
+		fi 
+		res=`grep "Device is not configured" $ROUTER_PROC/$dev 2> /dev/null`
+		if [ -z "$res" ]; then
+			echo "Device $dev is still running"
+			echo -e "Run wanrouter stop $dev first\n"
+			exit 1
+		fi
+		
+		#Since we changed the name of dev above,
+		#we must check if we are running ft1 device,
+		#output a correct message	
+
+		if [ $ft1_or_wanpipe -gt 0 ]; then
+			show "Starting up device: $dev, FT1 config mode" ; busy
+			echo "Starting up device: $dev, FT1 config mode" >> $ROUTER_LOG
+		else
+			show "Starting up device: $dev" ; busy
+			echo "Starting up device: $dev" >> $ROUTER_LOG
+		fi
+		router_config $ROUTER_CONF
+		if [ $? -ne 0 ]; then
+			fail
+			exit 3
+		fi
+
+		#When loading ft1 device there are not interfaces
+		if [ $ft1_or_wanpipe -eq 0 ]; then
+			interf_config $dev $ROUTER_CONF
+			if [ $? -ne 0 ]; then
+				fail
+				exit 4
+			fi
+		fi
+		ok
+	fi
+	;;
+  stop)	
+	#WANROUTER STOP
+
+	if [ -z $2 ]; then
+		#Check that all wanpipe#.conf file defined in 
+		# WAN_DEVICES exist
+		check_config || exit 1
+		[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
+			router_unload
+			echo -e "Router is already stopped !\n"
+			exit 1
+		}
+
+		#Stop all interfaces, but check whether 
+		#device is running first
+		for dev in $WAN_DEVICES; do
+			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+			check_running $dev || exit 1
+		done
+
+		#Stop all routers but check if device
+		#is running first
+		for dev in $WAN_DEVICES; do
+			check_running $dev || continue
+			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+			show "Shutting down device: $dev" ; busy
+			echo "Shutting down device: $dev" >> $ROUTER_LOG
+			router_unconfig $ROUTER_CONF
+			ok
+		done
+
+		#Check if any devices are still running
+		#  If YES: don't unload the modules, just printout
+		#	   the list of active devices
+		#  If NO:  unload modules
+
+		check_and_print_still_running && exit 0
+		echo -e "No devices running, Unloading Modules"
+		router_unload
+	else
+		#WANROUTER STOP WANPIPE
+		dev=$2
+		ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+		check_config_opt $dev 1
+		ft1_or_wanpipe=$?
+		dev=$($GET_RC)
+		rm -f $RC
+
+		#Check that all configuration files exist
+		check_file $ROUTER_CONF || exit 1
+
+		#Check that modules are up and running
+		[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
+			router_unload
+			echo -e "Router is already stopped !\n";
+			exit 1;
+		}
+
+		#If we are stopping FT1 driver, we have to check
+		#wheter the actual wanpipe# device is running or
+		#not, thus name dev has to be changed to 'wanpipe#'
+
+		if [ $ft1_or_wanpipe -gt 0 ]; then
+			dev="wanpipe$ft1_or_wanpipe"
+		fi 
+
+		#Check that device is running first
+		if [ $ft1_or_wanpipe -eq 0 ]; then
+			check_running $dev || {
+				echo -e "Error: Device $dev is already stopped\n"
+				exit 0;
+			}
+		fi
+		if [  $ft1_or_wanpipe -gt 0 ]; then
+			show "Shutting down device: $dev, FT1 config mode" ; busy
+			echo "Shutting down device: $dev, FT1 config mode" >> $ROUTER_LOG
+		else	
+			show "Shutting down device: $dev" ; busy
+			echo "Shutting down device: $dev" >> $ROUTER_LOG
+		fi
+		[ -f $WANPIPE_CONF_DIR/$FT1_CONF ] && rm -f $WANPIPE_CONF_DIR/$FT1_CONF
+		router_unconfig $ROUTER_CONF
+		ok
+
+		#Check if any devices are still running
+		#  If YES: don't unload the modules, just printout
+		#	   the list of active devices
+		#  If NO:  unload modules
+
+		check_and_print_still_running && exit 0
+		cd $ROUTER_HOME
+		echo -e "No devices running, Unloading Modules"
+		router_unload
+	fi			
+	;;
+  list|status)
+	[ -f "$ROUTER_LOCK" ] || {
+		echo -e "Router is stopped !\n";
+		exit 0;
+	}
+	echo -e "Devices currently active:"
+	print_active_devices;
+	exit 0;
+	;;
+  *)
+	echo -e "\nWAN Router startup script"
+	echo -e "Usage: $SCRIPT: {start|stop} <wanpipe#> optional\n"
+	echo -e "       wanrouter start : Starts all devices specified in"
+	echo -e "                      $ROUTER_RC WAN_DEVICES\n"
+	echo -e "       wanrouter stop  : Stops all devices specified in"
+	echo -e "                      $ROUTER_RC WAN_DEVICES\n"
+	echo -e "       wanrouter start wanpipe# : Starts only device wanpipe#\n"
+	echo -e "       wanrouter stop wanpipe#  : Stops only device wanpipe#" 
+	echo -e "                               (# can range from 1 to 16)\n"
+	echo -e " 	wanrouter status : List all active devices\n"
+	exit 1
+	;;
 esac
+
 exit 0

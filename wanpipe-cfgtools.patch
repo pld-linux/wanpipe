@@ -1,6 +1,6 @@
 diff -durN wanrouter.orig/config/ft1/cfgft1 wanrouter/config/ft1/cfgft1
 --- wanrouter.orig/config/ft1/cfgft1	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/ft1/cfgft1	Wed May  3 12:20:51 2000
++++ wanrouter/config/ft1/cfgft1	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
@@ -39,7 +39,7 @@ diff -durN wanrouter.orig/config/ft1/cfgft1 wanrouter/config/ft1/cfgft1
  
 diff -durN wanrouter.orig/config/wancfg/lib/chdlc_lib.sh wanrouter/config/wancfg/lib/chdlc_lib.sh
 --- wanrouter.orig/config/wancfg/lib/chdlc_lib.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/chdlc_lib.sh	Wed May  3 12:20:51 2000
++++ wanrouter/config/wancfg/lib/chdlc_lib.sh	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bins/sh
 +#!/bin/bash
@@ -48,7 +48,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/chdlc_lib.sh wanrouter/config/wancfg
  	
 diff -durN wanrouter.orig/config/wancfg/lib/fr_lib.sh wanrouter/config/wancfg/lib/fr_lib.sh
 --- wanrouter.orig/config/wancfg/lib/fr_lib.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/fr_lib.sh	Wed May  3 12:20:51 2000
++++ wanrouter/config/wancfg/lib/fr_lib.sh	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
@@ -57,7 +57,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/fr_lib.sh wanrouter/config/wancfg/li
  
 diff -durN wanrouter.orig/config/wancfg/lib/help.sh wanrouter/config/wancfg/lib/help.sh
 --- wanrouter.orig/config/wancfg/lib/help.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/help.sh	Wed May  3 12:20:52 2000
++++ wanrouter/config/wancfg/lib/help.sh	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
@@ -66,7 +66,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/help.sh wanrouter/config/wancfg/lib/
  # start_menu_help
 diff -durN wanrouter.orig/config/wancfg/lib/lib.sh wanrouter/config/wancfg/lib/lib.sh
 --- wanrouter.orig/config/wancfg/lib/lib.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/lib.sh	Wed May  3 12:21:59 2000
++++ wanrouter/config/wancfg/lib/lib.sh	Sat May  6 14:59:01 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
@@ -86,6 +86,15 @@ diff -durN wanrouter.orig/config/wancfg/lib/lib.sh wanrouter/config/wancfg/lib/l
  			fi
  			continue
  		fi
+@@ -1382,7 +1382,7 @@
+ 			NMSK_IP[$num]=$value
+ 			#echo "NMSK_IP=${NMSK_IP[$num]}"
+ 			  ;;
+-		POINTOPOINT)
++		POINTOPOINT|REMIP)
+ 			R_IP[$num]=$value
+ 			#echo "R_IP=${R_IP[$num]}"
+ 			  ;;
 @@ -1406,7 +1406,7 @@
  			  ;;
  		esac
@@ -117,7 +126,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/lib.sh wanrouter/config/wancfg/lib/l
  GATEWAY=${GATE_IP[$num]}
 diff -durN wanrouter.orig/config/wancfg/lib/ppp_lib.sh wanrouter/config/wancfg/lib/ppp_lib.sh
 --- wanrouter.orig/config/wancfg/lib/ppp_lib.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/ppp_lib.sh	Wed May  3 12:20:52 2000
++++ wanrouter/config/wancfg/lib/ppp_lib.sh	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bins/sh
 +#!/bin/bash
@@ -126,7 +135,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/ppp_lib.sh wanrouter/config/wancfg/l
  
 diff -durN wanrouter.orig/config/wancfg/lib/x25_lib.sh wanrouter/config/wancfg/lib/x25_lib.sh
 --- wanrouter.orig/config/wancfg/lib/x25_lib.sh	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/lib/x25_lib.sh	Wed May  3 12:20:52 2000
++++ wanrouter/config/wancfg/lib/x25_lib.sh	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash
@@ -135,7 +144,7 @@ diff -durN wanrouter.orig/config/wancfg/lib/x25_lib.sh wanrouter/config/wancfg/l
  
 diff -durN wanrouter.orig/config/wancfg/wancfg wanrouter/config/wancfg/wancfg
 --- wanrouter.orig/config/wancfg/wancfg	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/wancfg/wancfg	Wed May  3 12:20:52 2000
++++ wanrouter/config/wancfg/wancfg	Sat May  6 14:58:19 2000
 @@ -1,4 +1,4 @@
 -#!/bin/sh
 +#!/bin/bash

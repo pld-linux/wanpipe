@@ -80,22 +80,13 @@ gzip -9nf README samples/* || :
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/chkconfig --add wanrouter
-
-if [ -f /var/lock/subsys/wanrouter ]; then
-        /etc/rc.d/init.d/wanrouter restart 1>&2
-else
+if [ ! -f /var/lock/subsys/wanrouter ]; then
 	echo "Edit configuration files in /etc/wanpipe and /etc/sysconfig/interfaces"
-        echo "and type \"/etc/rc.d/init.d/wanrouter start\" to start wanrouter" 1>&2
 fi
+NAME=wanrouter; %chkconfig_add
 
 %preun
-if [ "$1" = "0" ]; then
-        if [ -f /var/lock/subsys/wanrouter ]; then
-                /etc/rc.d/init.d/wanrouter stop 1>&2
-        fi
-        /sbin/chkconfig --del wanrouter
-fi
+NAME=wanrouter; %chkconfig_del
 
 %files 
 %defattr(644,root,root,755)

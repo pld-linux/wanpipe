@@ -1,36 +1,112 @@
-diff -durN wanrouter.orig/config/ft1/source/Makefile wanrouter/config/ft1/source/Makefile
---- wanrouter.orig/config/ft1/source/Makefile	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/ft1/source/Makefile	Wed May  3 12:02:32 2000
-@@ -15,7 +15,7 @@
- VPATH  = $(SYSINC)
+--- wanpipe/util/misc/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
++++ wanpipe/util/misc/Makefile	2004-04-09 18:39:26.032529856 +0200
+@@ -15,7 +15,8 @@
+ WAN_VIRTUAL=
  
  # Tools options.
--CFLAGS  = -Wall -O2 -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
-+CFLAGS  = -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
+-CFLAGS  = -Wall -O2 -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) $(HOSTCFLAGS)
++OPTFLAGS=-O2
++CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) $(HOSTCFLAGS)
+ 
+ 
+ ####### RULES ################################################################
+--- wanpipe/util/wanconfig/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
++++ wanpipe/util/wanconfig/Makefile	2004-04-09 18:40:07.506224896 +0200
+@@ -15,7 +15,8 @@
+ WAN_VIRTUAL=
+ 
+ # Tools options.
+-CFLAGS  = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -D_DEBUG_=$(DEBUG)
++OPTFLAGS=-O2
++CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -I../../patches/kdrivers/include -D_DEBUG_=$(DEBUG)
+ 
+ ####### RULES ################################################################
+ 
+--- wanpipe/util/wanpipemon/Makefile.orig	2004-01-15 17:10:28.000000000 +0100
++++ wanpipe/util/wanpipemon/Makefile	2004-04-09 18:41:11.266531856 +0200
+@@ -11,14 +11,13 @@
+ DEBUG	= 2
+ 
+ # Project file paths.
+-SYSINC	= /usr/src/linux/include
+ WAN_VIRTUAL=
+ LXDIR=../lxdialog
+ ENABLE_GUI=YES
+ PROTOCOL_DEFS=
+ #-DCONFIG_PRODUCT_WANPIPE_ADSL
+ 
+-HOSTCFLAGS=-I$(SYSINC)
++HOSTCFLAGS=-I../../patches/kdrivers/include
+ ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
+         HOSTCFLAGS += -I/usr/include/ncurses
+ else
+@@ -29,7 +28,8 @@
+ endif
+ 
+ # Tools options.
+-CFLAGS  = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
++OPTFLAGS=-O2
++CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
+ 
+ ifeq "${ENABLE_GUI}" "NO"
+ LX_OBJ =
+--- wanpipe/util/sdladump/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
++++ wanpipe/util/sdladump/Makefile	2004-04-09 18:39:45.744533176 +0200
+@@ -13,7 +13,8 @@
+ SYSINC	= /usr/src/linux/include
+ 
+ # Tools options.
+-CFLAGS  = -D__LINUX__ -I$(SYSINC) -Wall -O2  -D_DEBUG_=$(DEBUG) 
++OPTFLAGS=-O2
++CFLAGS  = -D__LINUX__ -I../../patches/kdrivers/include -Wall $(OPTFLAGS)  -D_DEBUG_=$(DEBUG) 
+ 
+ 
+ ####### RULES ################################################################
+--- wanpipe/util/ft1/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
++++ wanpipe/util/ft1/Makefile	2004-04-09 18:38:37.559898816 +0200
+@@ -10,10 +10,7 @@
+ OS_TYPE	= _LINUX_
+ DEBUG	= 2
+ 
+-# Project file paths.
+-SYSINC = /usr/src/linux/include
+-
+-HOSTCFLAGS=-I/usr/src/linux/include 
++HOSTCFLAGS=-I../../patches/kdrivers/include
+ ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
+         HOSTCFLAGS += -I/usr/include/ncurses
+ else
+@@ -24,7 +21,8 @@
+ endif
+ 
+ # Tools options.
+-CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS) 
++OPTFLAGS=-O2
++CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS) 
  LIBS = -lncurses
  
  ####### RULES ################################################################
-diff -durN wanrouter.orig/config/lxdialog/Makefile wanrouter/config/lxdialog/Makefile
---- wanrouter.orig/config/lxdialog/Makefile	Thu Apr  6 23:56:32 2000
-+++ wanrouter/config/lxdialog/Makefile	Wed May  3 12:03:09 2000
-@@ -1,7 +1,7 @@
- CC = gcc 
- CPP = gcc -E
+--- wanpipe/util/lxdialog/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
++++ wanpipe/util/lxdialog/Makefile	2004-04-09 18:39:10.810843904 +0200
+@@ -3,7 +3,8 @@
  
--CFLAGS = -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -DLOCALE 
+ SYSINC=/usr/src/linux/include
+ 
+-CFLAGS = -Wall -Wstrict-prototypes -I$(SYSINC) -O2 -fomit-frame-pointer -DLOCALE 
++OPTFLAGS=-O2 -fomit-frame-pointer
 +CFLAGS = -Wall -Wstrict-prototypes $(OPTFLAGS) -DLOCALE 
  LDFLAGS = -s -L .
  LDLIBS = -lncurses
+ WAN_VIRTUAL=
+--- wanpipe/util/bwm/Makefile.orig	2003-10-08 17:38:05.000000000 +0200
++++ wanpipe/util/bwm/Makefile	2004-04-09 18:38:09.166215312 +0200
+@@ -1,5 +1,8 @@
++CC=gcc
++OPTFLAGS=-O2
++
+ all: bwm.c
+-	cc $(CFLAGS) -O2 -Wall bwm.c -o wpbwm
++	$(CC) $(CFLAGS) $(OPTFLAGS) -Wall bwm.c -o wpbwm
  
-diff -durN wanrouter.orig/util/Makefile wanrouter/util/Makefile
---- wanrouter.orig/util/Makefile	Thu Apr  6 23:56:32 2000
-+++ wanrouter/util/Makefile	Wed May  3 12:02:04 2000
-@@ -17,7 +17,7 @@
- VPATH	= $(SYSINC)
- 
- # Tools options.
--CFLAGS	= -Wall -O2 -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
-+CFLAGS	= -Wall $(OPTFLAGS) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I/usr/src/linux/include
- 
- ####### RULES ################################################################
- 
+ clean:
+ 	rm wpbwm

@@ -179,11 +179,11 @@ check_config()
 {
 	for dev in $WAN_DEVICES; do
 		check_file "$WANPIPE_CONF_DIR/$dev.conf" || {
-				echo -e "\n$SCRIPT: Error, $WANPIPE_CONF_DIR/$dev.conf not found!\n";
-				return 1;
+				echo -e "\n$SCRIPT: Error, $WANPIPE_CONF_DIR/$dev.conf not found!\n"
+				return 1
 				}
 	done
-	return 0;
+	return 0
 }
 
 check_file()
@@ -197,15 +197,15 @@ check_file()
 			else
 				echo -e "ERROR: Wanpipe configuration file not found in $WANPIPE_CONF_DIR\n"
 			fi
-			return 1;
+			return 1
 	}
-	return 0;
+	return 0
 }
 
 print_active_devices()
 {
-	local ac_list;
-	local ac_wan;
+	local ac_list
+	local ac_wan
 
 	echo -en "\t" 
 
@@ -214,7 +214,7 @@ print_active_devices()
 	[ ! -d "$ROUTER_PROC" ] && return 0 
 
 	cd $ROUTER_PROC
-	ac_list=`ls wanpipe*`;
+	ac_list=`ls wanpipe*`
 	for ac_wan in $ac_list; do
 		res=`grep "Device is not configured" $ROUTER_PROC/$ac_wan 2> /dev/null`
 		[ -z "$res" ] && {
@@ -246,7 +246,7 @@ check_running ()
 		}
 	
 	#Device not running
-	return 1;
+	return 1
 }
 
 check_and_print_still_running ()
@@ -261,7 +261,7 @@ check_and_print_still_running ()
 		res=`grep "Device is not configured" $ROUTER_PROC/$wan 2> /dev/null`
 		[ -z "$res" ] && {
 			echo "Devices still running:"
-			print_active_devices;
+			print_active_devices
 			return 0
 		}
 	done		
@@ -284,8 +284,8 @@ create_ft1_conf () {
 			wandev=${wandev// /}
 		fi
 	else
-		echo -e "Error: Device name not found in $WANPIPE_CONF_DIR/$dev.conf\n"
-		exit 1
+		echo -e "Error: Device name not found in $WANPIPE_CONF_DIR/$dev.conf\n" >&2
+		exit 2
 	fi
 
 	wancpu=`grep "S514CPU.*=.*" -i $WANPIPE_CONF_DIR/$dev.conf 2> /dev/null`
@@ -295,9 +295,9 @@ create_ft1_conf () {
 
 	if [ -z "$wancpu" -o -z "$wanslot" ]; then
 		if [ -z "$wanio" -o -z "$wanirq" ]; then
-			echo -e "Error: Missing fileds in $WANPIPE_CONF_DIR/$dev.conf" 
-			echo -e "       configuraton file, in [$wandev] section.\n " 
-			exit 1
+			echo -e "Error: Missing fileds in $WANPIPE_CONF_DIR/$dev.conf" >&2
+			echo -e "       configuraton file, in [$wandev] section.\n " >&2
+			exit 6
 		fi
 	fi
 
@@ -355,7 +355,7 @@ check_config_opt ()
 		#Check if wanpipe#.conf file exists
 		check_file "$WANPIPE_CONF_DIR/$dev.conf"
 		if [ $? -gt 0 ]; then
-			exit 1
+			exit 6
 		fi
 
 		#If we are starting the router up, create
@@ -382,7 +382,7 @@ check_config_opt ()
 		#Check if wanpipe#.conf file exists
 		check_file "$WANPIPE_CONF_DIR/$dev.conf"
 		if [ $? -gt 0 ]; then
-			exit 1
+			exit 6
 		fi
 
 		#return string wanpipe#
@@ -396,8 +396,8 @@ check_config_opt ()
 
 	*)
 		#Illegal syntax obtained
-		echo "Error: Incorrect device name syntax !"
-		exit 1
+		echo "Error: Incorrect device name syntax !" >&2
+		exit 2
 		;;
 	esac
 
@@ -487,15 +487,15 @@ case "$1" in
   start)	
 	# ROUTER START
 	if [ -z $2 ]; then	
-		check_config || exit 1
+		check_config || exit 6
 		[ -f "$ROUTER_LOCK" ] && {
 			echo -e "Router is already running. Stop it first!\n"
-			exit 1
+			exit 0
 		}
 		router_load && touch $ROUTER_LOCK
 		for dev in $WAN_DEVICES; do
 			[ ! -e "$ROUTER_PROC/$dev" ] && {
-				echo -e "Error: Device $dev is not supported by kernel\n"
+				echo -e "Error: Device $dev is not supported by kernel\n" >&2
 				exit 1
 			}
 			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
@@ -518,7 +518,7 @@ case "$1" in
 		dev=$($GET_RC)
 		rm -f $RC
 		ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-		check_file $ROUTER_CONF || exit 1
+		check_file $ROUTER_CONF || exit 0
 		[ ! -f "$ROUTER_LOCK" ] && {
 			router_load && touch $ROUTER_LOCK
 		}	
@@ -534,7 +534,7 @@ case "$1" in
 		if [ -z "$res" ]; then
 			echo "Device $dev is still running"
 			echo -e "Run wanrouter stop $dev first\n"
-			exit 1
+			exit 0
 		fi
 		
 		#Since we changed the name of dev above,
@@ -551,15 +551,15 @@ case "$1" in
 		router_config $ROUTER_CONF
 		if [ $? -ne 0 ]; then
 			fail
-			exit 3
+			exit 6
 		fi
 
-		#When loading ft1 device there are not interfaces
+		#When loading ft1 device there is no interface
 		if [ $ft1_or_wanpipe -eq 0 ]; then
 			interf_config $dev $ROUTER_CONF
 			if [ $? -ne 0 ]; then
 				fail
-				exit 4
+				exit 1
 			fi
 		fi
 		ok
@@ -571,18 +571,18 @@ case "$1" in
 	if [ -z $2 ]; then
 		#Check that all wanpipe#.conf file defined in 
 		# WAN_DEVICES exist
-		check_config || exit 1
+		check_config || exit 6
 		[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
 			router_unload
 			echo -e "Router is already stopped !\n"
-			exit 1
+			exit 0
 		}
 
 		#Stop all interfaces, but check whether 
 		#device is running first
 		for dev in $WAN_DEVICES; do
 			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
-			check_running $dev || exit 1
+			check_running $dev || exit 0
 		done
 
 		#Stop all routers but check if device
@@ -614,13 +614,13 @@ case "$1" in
 		rm -f $RC
 
 		#Check that all configuration files exist
-		check_file $ROUTER_CONF || exit 1
+		check_file $ROUTER_CONF || exit 6
 
 		#Check that modules are up and running
 		[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
 			router_unload
-			echo -e "Router is already stopped !\n";
-			exit 1;
+			echo -e "Router is already stopped !\n"
+			exit 0
 		}
 
 		#If we are stopping FT1 driver, we have to check
@@ -634,8 +634,8 @@ case "$1" in
 		#Check that device is running first
 		if [ $ft1_or_wanpipe -eq 0 ]; then
 			check_running $dev || {
-				echo -e "Error: Device $dev is already stopped\n"
-				exit 0;
+				echo -e "Device $dev is already stopped\n"
+				exit 0
 			}
 		fi
 		if [  $ft1_or_wanpipe -gt 0 ]; then
@@ -662,12 +662,12 @@ case "$1" in
 	;;
   list|status)
 	[ -f "$ROUTER_LOCK" ] || {
-		echo -e "Router is stopped !\n";
-		exit 0;
+		echo -e "Router is stopped !\n"
+		exit 0
 	}
 	echo -e "Devices currently active:"
-	print_active_devices;
-	exit 0;
+	print_active_devices
+	exit 0
 	;;
   *)
 	echo -e "\nWAN Router startup script"
@@ -680,7 +680,7 @@ case "$1" in
 	echo -e "       wanrouter stop wanpipe#  : Stops only device wanpipe#" 
 	echo -e "                               (# can range from 1 to 16)\n"
 	echo -e " 	wanrouter status : List all active devices\n"
-	exit 1
+	exit 3
 	;;
 esac
 

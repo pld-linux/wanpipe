@@ -64,16 +64,16 @@ cd ../../lxdialog
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/{%{_sbindir},%{_libdir}/wanrouter/{firmware,config/wancfg,config/ft1}} \
-	$RPM_BUILD_ROOT/{/var/log,%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
+install -d $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/wanrouter/{firmware,config/wancfg,config/ft1}} \
+	$RPM_BUILD_ROOT{/var/log,%{_sysconfdir},/etc/{rc.d/init.d,sysconfig}}
 
 install util/bin/* $RPM_BUILD_ROOT%{_sbindir}
 install firmware/* $RPM_BUILD_ROOT%{_libdir}/wanrouter/firmware
-install config/lxdialog/lxdialog  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config
-install config/wancfg/wancfg  $RPM_BUILD_ROOT%{_sbindir}
-install config/wancfg/lib/*  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/wancfg
+install config/lxdialog/lxdialog $RPM_BUILD_ROOT%{_libdir}/wanrouter/config
+install config/wancfg/wancfg $RPM_BUILD_ROOT%{_sbindir}
+install config/wancfg/lib/* $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/wancfg
 install config/ft1/cfgft1 $RPM_BUILD_ROOT%{_sbindir}
-install config/ft1/source/{ft1_exec,ft1_print}  $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/ft1
+install config/ft1/source/{ft1_exec,ft1_print} $RPM_BUILD_ROOT%{_libdir}/wanrouter/config/ft1
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
@@ -86,18 +86,18 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/chkconfig --add wanrouter
 if [ -f /var/lock/subsys/wanrouter ]; then
-        /etc/rc.d/init.d/wanrouter restart 1>&2
+	/etc/rc.d/init.d/wanrouter restart 1>&2
 else
 	echo "Edit configuration files in /etc/wanpipe and /etc/sysconfig/interfaces"
-        echo "and type \"/etc/rc.d/init.d/wanrouter start\" to start wanrouter" 1>&2
+	echo "and type \"/etc/rc.d/init.d/wanrouter start\" to start wanrouter" 1>&2
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-        if [ -f /var/lock/subsys/wanrouter ]; then
-                /etc/rc.d/init.d/wanrouter stop 1>&2
-        fi
-        /sbin/chkconfig --del wanrouter
+	if [ -f /var/lock/subsys/wanrouter ]; then
+		/etc/rc.d/init.d/wanrouter stop 1>&2
+	fi
+	/sbin/chkconfig --del wanrouter
 fi
 
 %files

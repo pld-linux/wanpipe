@@ -1,0 +1,208 @@
+diff -durN wanrouter.orig/config/ft1/cfgft1 wanrouter/config/ft1/cfgft1
+--- wanrouter.orig/config/ft1/cfgft1	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/ft1/cfgft1	Wed May  3 12:20:51 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #====================================================================
+ # CFGFT1
+ #
+@@ -1386,16 +1386,16 @@
+ 
+ PROG_NAME=cfgft1
+ ROUTER_PROC=/proc/net/wanrouter
+-PROD_HOME=/usr/local/wanrouter
++PROD_HOME=/usr/lib/wanrouter
+ FT1_CONF=$(pwd)/FT1_CONFIG
+-FT1_EXEC=$PROD_HOME/config/ft1/source/ft1_exec
+-FT1_PRINT=$PROD_HOME/config/ft1/source/ft1_print
++FT1_EXEC=$PROD_HOME/config/ft1/ft1_exec
++FT1_PRINT=$PROD_HOME/config/ft1/ft1_print
+ WANROUTER=wanrouter
+ RC=$(pwd)/return_code
+ GET_RC="cat $RC"
+ TEMP=temp.$$
+ WAN_DEVICE=$1
+-ROUTER_RC=$PROD_HOME/wanrouter.rc
++ROUTER_RC=/etc/sysconfig/wanrouter
+ WAN_LOAD=NO
+ 
+ source $ROUTER_RC
+@@ -1423,7 +1423,7 @@
+ 
+ [ -f "$FT1_CONF" ] && rm -f $FT1_CONF 
+ 
+-DIALOG=${DIALOG=$PROD_HOME/config/lxdialog/lxdialog}
++DIALOG=${DIALOG=$PROD_HOME/config/lxdialog}
+ 
+ check_dialog
+ 
+diff -durN wanrouter.orig/config/wancfg/lib/chdlc_lib.sh wanrouter/config/wancfg/lib/chdlc_lib.sh
+--- wanrouter.orig/config/wancfg/lib/chdlc_lib.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/chdlc_lib.sh	Wed May  3 12:20:51 2000
+@@ -1,4 +1,4 @@
+-#!/bins/sh
++#!/bin/bash
+ 
+ function chdlc_interface_init () {
+ 	
+diff -durN wanrouter.orig/config/wancfg/lib/fr_lib.sh wanrouter/config/wancfg/lib/fr_lib.sh
+--- wanrouter.orig/config/wancfg/lib/fr_lib.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/fr_lib.sh	Wed May  3 12:20:51 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ function fr_interface_setup () {
+ 
+diff -durN wanrouter.orig/config/wancfg/lib/help.sh wanrouter/config/wancfg/lib/help.sh
+--- wanrouter.orig/config/wancfg/lib/help.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/help.sh	Wed May  3 12:20:52 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ #============================================================
+ # start_menu_help
+diff -durN wanrouter.orig/config/wancfg/lib/lib.sh wanrouter/config/wancfg/lib/lib.sh
+--- wanrouter.orig/config/wancfg/lib/lib.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/lib.sh	Wed May  3 12:21:59 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ function interface_menu () {
+ 
+@@ -1359,10 +1359,10 @@
+ 	do 
+ 		num=$((num+1))
+ 
+-		if [ ! -f "$INTERFACE_DIR/${IF_NAME[$num]}" ];
++		if [ ! -f "$INTERFACE_DIR/ifcfg-${IF_NAME[$num]}" ];
+ 		then 
+ 			if [ ${OP_MODE[$num]} = WANPIPE ]; then
+-				echo "File not found $INTERFACE_DIR/${IF_NAME[$num]}"  
++				echo "File not found $INTERFACE_DIR/ifcfg-${IF_NAME[$num]}"  
+ 			fi
+ 			continue
+ 		fi
+@@ -1406,7 +1406,7 @@
+ 			  ;;
+ 		esac
+ 
+-		done < $INTERFACE_DIR/${IF_NAME[$num]}
++		done < $INTERFACE_DIR/ifcfg-${IF_NAME[$num]}
+ 	done
+ 
+ 	IFS=" "
+@@ -1614,16 +1614,17 @@
+ 
+ 		date=`date`
+ 
+-		cat <<EOM > $INTERFACE_DIR/${IF_NAME[$if_num]}
++		cat <<EOM > $INTERFACE_DIR/ifcfg-${IF_NAME[$if_num]}
+ #!/bin/sh
+ # Wanrouter interface configuration file
+ # name:	${IF_NAME[$if_num]}
+ # date:	$date
+ #
+ ONBOOT=yes
++DEVICE=${IF_NAME[$if_num]}
+ IPADDR=${L_IP[$if_num]}
+ NETMASK=${NMSK_IP[$if_num]}
+-POINTOPOINT=${R_IP[$if_num]}
++REMIP=${R_IP[$if_num]}
+ BROADCAST=${BCAST_IP[$num]}
+ NETWORK=${NETWRK_IP[$if_num]}
+ GATEWAY=${GATE_IP[$num]}
+diff -durN wanrouter.orig/config/wancfg/lib/ppp_lib.sh wanrouter/config/wancfg/lib/ppp_lib.sh
+--- wanrouter.orig/config/wancfg/lib/ppp_lib.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/ppp_lib.sh	Wed May  3 12:20:52 2000
+@@ -1,4 +1,4 @@
+-#!/bins/sh
++#!/bin/bash
+ 
+ function ppp_interface_setup () {
+ 
+diff -durN wanrouter.orig/config/wancfg/lib/x25_lib.sh wanrouter/config/wancfg/lib/x25_lib.sh
+--- wanrouter.orig/config/wancfg/lib/x25_lib.sh	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/lib/x25_lib.sh	Wed May  3 12:20:52 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ function x25_interface_setup () {
+ 
+diff -durN wanrouter.orig/config/wancfg/wancfg wanrouter/config/wancfg/wancfg
+--- wanrouter.orig/config/wancfg/wancfg	Thu Apr  6 23:56:32 2000
++++ wanrouter/config/wancfg/wancfg	Wed May  3 12:20:52 2000
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ #***************************************************************
+ # WANCFG :  WANPIPE(tm) Configuration Utility
+@@ -933,7 +933,7 @@
+ # check_setup  
+ #
+ #  	Check that all libraries exit as well as 
+-#       /etc/wanrouter.rc.  
++#       /etc/sysconfig/wanrouter.  
+ #       Wanpipe Package must be installed before
+ #       proceeding.
+ #============================================================
+@@ -959,12 +959,12 @@
+ 		exit 1
+ 	fi
+ 
+-	if [ ! -f "$PROD_HOME/wanrouter.rc" ]; then
++	if [ ! -f "/etc/sysconfig/wanrouter" ]; then
+ 		cat << EOM
+ 
+ 	BAD CONFIGURATION - FILE MISSING
+ 
+-	/etc/wanrouter.rc file could not 
++	/etc/sysconfig/wanrouter file could not 
+ be found. Please make sure that the wanpipe
+ pacakge has been correctly installed before
+ proceeding to configure a Sangoma device.
+@@ -1058,10 +1058,10 @@
+ RC=$(pwd)/return_code
+ GET_RC="cat $RC"
+ TEMP=temp.$$
+-PROD_HOME=/usr/local/wanrouter
++PROD_HOME=/usr/lib/wanrouter
+ EXIT=0
+ BACK=1
+-WANCFG_LIB=$PROD_HOME/config/wancfg/lib
++WANCFG_LIB=$PROD_HOME/config/wancfg
+ 
+ menuinstr_exit="------------------------------------------ \
+ Use arrows to navigate through the options. \
+@@ -1081,7 +1081,7 @@
+ 
+ #Load the library files
+ echo -n "."
+-source $PROD_HOME/wanrouter.rc
++source /etc/sysconfig/wanrouter
+ source $WANCFG_LIB/lib.sh
+ source $WANCFG_LIB/fr_lib.sh
+ source $WANCFG_LIB/ppp_lib.sh
+@@ -1089,14 +1089,14 @@
+ source $WANCFG_LIB/help.sh
+ source $WANCFG_LIB/x25_lib.sh
+ 
+-PROD_CONF=$WANPIPE_CONF_DIR
+-INTERFACE_DIR=$WANPIPE_INTR_DIR
++PROD_CONF=/etc/wanpipe
++INTERFACE_DIR=/etc/sysconfig/interfaces
+ #PROD_CONF="."
+ 
+ 
+ set_geometry `stty size 2>/dev/null`
+ 
+-DIALOG=${DIALOG=$PROD_HOME/config/lxdialog/lxdialog}
++DIALOG=${DIALOG=$PROD_HOME/config/lxdialog}
+ 
+ if [ ! -f "$DIALOG" ]; then
+ 	cat <<EOM

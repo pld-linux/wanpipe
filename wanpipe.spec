@@ -15,9 +15,10 @@ Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-ncurses.patch
 URL:		http://www.sangoma.com/
-Buildrequires:	ncurses-devel >= 5.2
+BuildRequires:	ncurses-devel >= 5.2
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-Prereq:		/sbin/chkconfig
 
 %define		_sysconfdir	/etc/wanpipe
 

@@ -41,7 +41,7 @@ OPTFLAGS="$RPM_OPT_FLAGS"
 export OPTFLAGS
 
 cd util
-make OUTDIR=bin
+%{__make} OUTDIR=bin
 
 cd ../config/ft1/source
 make

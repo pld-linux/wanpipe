@@ -3,7 +3,7 @@
 # wanrouter	Starts WAN router using WANPIPE drivers.
 #
 # chkconfig:	2345 30 70
-# description:	WANPIPE is a set of drivers and utilites for
+# description:	WANPIPE is a set of drivers and utilites for \
 #		WAN router using Sangoma cards
 #
 # $Revision$ $Date$

@@ -1,0 +1,26 @@
+#!/bin/sh
+# router.rc	WAN router meta-configuration file.
+#
+#		This file defines variables used by the router shell scripts
+#		and should be located in /etc directory.  These are:
+#
+#		ROUTER_BOOT=		Boot flag (YES/NO).
+#		WANPIPE_CONF_DIR=       Directory of wanpipe config files. 
+#		ROUTER_LOG= 		Where to put start-up log file.
+#		ROUTER_LOCK=		File used as a lock.
+#		WAN_DEVICES=            Name of the wanpipe devices to be
+#                                       loaded on 'router start'
+#                                       (ex: "wanpipe1 wanpipe2 wanpipe3...")
+#                                      
+#                              Note:    Name of wanpipe devices correspond
+#                                       to the configuration files in 
+#                                       /etc directory:
+#                                         (ex. /etc/wanpipe1.conf )
+#
+#		Note:	This file is 'executed' by the shell script, so
+#			the usual shell syntax must be observed.
+ROUTER_BOOT=YES
+WANPIPE_CONF_DIF=/etc/wanpipe
+ROUTER_LOG=/var/log/wanrouter
+ROUTER_LOCK=/var/lock/subsys/wanrouter
+WAN_DEVICES="wanpipe1"

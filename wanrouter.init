@@ -1,0 +1,456 @@
+#!/bin/sh
+#
+# wanrouter     Starts WAN router using WANPIPE drivers.
+#
+# chkconfig:	2345 30 70
+# description:  WANPIPE is a set of drivers and utilites for
+#		WAN router using Sangoma cards
+#		
+
+# This script is changed for use with PLD and its rc-scripts
+#
+# It just initializes Sangoma cards now. Interfaces are configured
+# the same way as ethernet devices in PLD 
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# wanrouter	WAN Router Initialization Script.
+#
+#
+# copyright	(c) 1999, Sangoma Technologies Inc.
+#
+#		This program is free software; you can redistribute it and/or
+#		modify it under the terms of the GNU General Public License
+#		as published by the Free Software Foundation; either version
+#		2 of the License, or (at your option) any later version.
+# ============================================================================
+# Nov 09, 1999  Nenad Corbic    o Updated for v2.1.1
+#                               o Enabled starting and stoping
+#                                 each wanpipe device separately.
+# Nov 09, 1999  Nenad Corbic    Updated for v2.1.1
+# Oct 04, 1999  Nenad Corbic    Updated for v2.1.0
+# Aug 04, 1999  Nenad Corbic    Updated for v2.0.5
+# Oct 15, 1998	Jaspreet Singh	Updated for v2.0.4
+# Dec 09, 1997	Jaspreet Singh	Updated for v2.0.2
+# Nov 28, 1997	Jaspreet Singh	Updated for v2.0.1
+# Nov 06, 1997	Jaspreet Singh	Updated for v2.0.0
+# Jul 28, 1997	Jaspreet Singh	Updated for v1.0.5
+# Jul 10, 1997	Jaspreet Singh	Updated for v1.0.4
+# Dec 15, 1996	Gene Kozin	Initial version based on Sangoma's WANPIPE(tm)
+# ============================================================================
+
+####### FUNCTION DEFINITIONS #################################################
+
+# ----------------------------------------------------------------------------
+# Check to see if a value belongs to the list.
+# Return:	0 - yes
+#		1 - no
+# ----------------------------------------------------------------------------
+check_list()
+{
+	[ $# -lt 2 ] && return 1
+
+	val=$1
+	shift
+	for i in $*
+	do [ "$val" = "$i" ] && return 0
+	done
+	return 1
+}
+
+# ----------------------------------------------------------------------------
+# Display error message.
+# ----------------------------------------------------------------------------
+error() {
+	echo -e "$SCRIPT: $*!"
+	[ -f "$ROUTER_LOG" ] && echo -e "$*!" >> $ROUTER_LOG
+	return 0
+}
+
+# ----------------------------------------------------------------------------
+# Start WAN wanrouter.
+#	o create log file
+#	o check configuration file presence
+#	o load WAN drivers (using modprobe)
+#	o configure drivers
+#	o configure interfaces
+# ----------------------------------------------------------------------------
+router_load()
+{
+
+	show "Starting WAN Router" ; started 
+	echo "`date`: starting WAN router" > $ROUTER_LOG
+
+	[ -f "$MOD1" ] || {
+		mod_error $MOD1
+		return 1
+	}
+		
+        [ -f "$MOD2" ] || {
+		mod_error $MOD2 
+                return 1
+        }           
+        [ -f "$MOD3" ] || {
+		mod_error $MOD3 
+                return 1
+        }          
+
+#	[ -f "$ROUTER_CONF" ] || {
+#		error "Configuration file $ROUTER_CONF not found"
+#		return 1
+#	}
+
+	[ "$ROUTER_BOOT" = "NO" -o -z "$WAN_DRIVERS" ] && { 
+		echo -e "\n\nERROR in $ROUTER_RC file !!!" 
+		echo -e "   ROUTER_BOOT is set to NO, OR" 
+		echo -e "   WAN_DRIVERS must be set to wanpipe\n"
+		echo -e "   wanrouter start failed !!!\n" 
+		return 1
+  	}
+
+	show "Loading WAN drivers: " ; started
+	for i in $WAN_DRIVERS
+	do
+		lsmod | grep -wq $i && continue
+		show "        $i "; busy
+		echo -n "Loading driver $i ... " >> $ROUTER_LOG
+		if modprobe $i
+		then 
+			echo "ok" >> $ROUTER_LOG 
+			deltext; ok
+		else 
+			echo "fail" >> $ROUTER_LOG
+			deltext; fail
+		fi
+	done
+	return 0
+}
+
+router_config()
+{
+	# Configure router.
+	# $1 = /etc/wanpipe#.conf  where # is an integer
+	wanconfig -v -f $1 >> $ROUTER_LOG
+	return 
+}
+
+# ----------------------------------------------------------------------------
+# Stop WAN router.
+#	o shut down interfaces
+#	o unload WAN drivers
+#	o remove lock file
+# ----------------------------------------------------------------------------
+
+router_unconfig()
+{
+	wanconfig -v -d $1 >> $ROUTER_LOG
+	# Unload WAN drivers.
+}
+
+router_unload()
+{
+	for i in $WAN_DRIVERS
+	do lsmod | grep -wq $i && {
+		modprobe -r $i
+	}
+	done
+	rm -f $ROUTER_LOCK 2> /dev/null
+}
+
+mod_error()
+{
+	echo -e "\n"
+        error "Wanpipe Module: $1 not found !!!"
+        echo -e "        WANPIPE drivers must be compiled as modules"
+        echo -e "        Check kernel configuration in /usr/src/linux/.config: "
+        echo -e "             CONFIG_WAN_ROUTER=m"
+        echo -e "             CONFIG_VENDOR_SANGOMA=m\n"               
+}
+
+check_config()
+{
+	for dev in $WAN_DEVICES; do
+		check_file "$WANPIPE_CONF_DIR/$dev.conf" || {
+				echo -e "\n$SCRIPT: Error, $WANPIPE_CONF_DIR/$dev.conf not found!\n";
+				return 1;
+				}
+	done
+	return 0;
+}
+
+check_file()
+{
+	local file=$1
+
+	[ ! -f "$file" ] && {
+			if [ ! -z $file ]; 
+			then
+				echo -e "ERROR: Wanpipe configuration file not found: $file\n"
+			else
+				echo -e "ERROR: Wanpipe configuration file not found in $WANPIPE_CONF_DIR\n"
+			fi
+			return 1;
+	}
+	return 0;
+}
+
+print_active_devices()
+{
+	local ac_list;
+	local ac_wan;
+
+	echo -en "\t" 
+
+	#If /proc directory doesn't exist nothing
+        #to print, thus exit
+	[ ! -d "$ROUTER_PROC" ] && return 0 
+
+	cd $ROUTER_PROC
+	ac_list=`ls wanpipe*`;
+	for ac_wan in $ac_list; do
+		res=`grep "Device is not configured" $ROUTER_PROC/$ac_wan`
+		[ -z "$res" ] && {
+			echo -n "$ac_wan "
+		}
+	done		
+	echo -e "\n" 
+
+	cd $ROUTER_HOME
+
+	return 0
+}
+
+check_running ()
+{
+
+	local device=$1
+	local res
+
+	
+	[ ! -d "$ROUTER_PROC" ] && return 1  #Device not running
+
+	cd $ROUTER_PROC
+	
+	res=`grep "Device is not configured" $ROUTER_PROC/$device`
+	[ -z "$res" ] && {
+			#Device running
+			return 0
+		}
+	
+	#Device not running
+	return 1;
+}
+
+check_and_print_still_running ()
+{
+	local WAN_LIST
+	local res
+	local wan
+
+	cd $ROUTER_PROC
+	WAN_LIST=`ls wanpipe*`	
+	for wan in $WAN_LIST; do
+		res=`grep "Device is not configured" $ROUTER_PROC/$wan`
+		[ -z "$res" ] && {
+			echo "Devices still running:"
+			print_active_devices;
+			return 0
+		}
+	done		
+	cd $ROUTER_HOME
+
+	return 1
+}
+
+####### MAIN #################################################################
+# set -x
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ROUTER_VERSION=2.1.1
+ROUTER_RC=/etc/sysconfig/wanrouter
+ROUTER_HOME=/usr/lib/wanrouter
+SCRIPT=wanrouter
+ROUTER_PROC=/proc/net/wanrouter
+WAN_DRIVERS=wanpipe
+MOD1=/lib/modules/$(uname -r)/misc/wanrouter.o
+MOD2=/lib/modules/$(uname -r)/net/wanpipe.o
+MOD3=/lib/modules/$(uname -r)/net/sdladrv.o
+
+# Ignore interrupt signals.
+trap '' 2
+
+# Read meta-configuration file.
+if [ -f $ROUTER_RC ]
+then . $ROUTER_RC
+else echo "$SCRIPT: WARNING: $ROUTER_RC not found! Using defaults."
+fi
+
+# Set default configuration.
+ROUTER_BOOT=${ROUTER_BOOT:=YES}
+WANPIPE_CONF_DIR=${WANPIPE_CONF_DIR:=/etc/wanpipe}
+ROUTER_LOG=${ROUTER_LOG:=/var/log/wanrouter}
+ROUTER_LOCK=${ROUTER_LOCK:=/var/lock/subsys/wanrouter}
+WAN_DEVICES=${WAN_DEVICES:="wanpipe1"}
+
+# See how we were called.
+case "$1" in
+	start)	
+		# ROUTER START
+		if [ -z $2 ]; then	
+
+			check_config || exit 1
+
+			[ -f "$ROUTER_LOCK" ] && {
+				echo -e "Router is already running. Stop it first!\n"
+				exit 1
+			}
+			router_load && touch $ROUTER_LOCK
+
+			for dev in $WAN_DEVICES; do
+				[ ! -e "$ROUTER_PROC/$dev" ] && {
+					echo -e "Error: Device $dev is not supported by kernel\n"
+					exit 1
+				}
+				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+				show "Starting up device: $dev" ; busy
+				echo "Starting up device: $dev" >> $ROUTER_LOG
+				router_config $ROUTER_CONF
+				deltext ; ok
+			done
+		else
+		#ROUTER START WANPIPE
+
+			dev=$2
+			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+
+			check_file $ROUTER_CONF || exit 1
+
+			[ ! -f "$ROUTER_LOCK" ] && {
+				router_load && touch $ROUTER_LOCK
+			}	
+
+			res=`grep "Device is not configured" $ROUTER_PROC/$dev`
+			[ -z "$res" ] && {
+				echo "Device $dev is still running"
+				echo -e "Run wanrouter stop $dev first\n"
+				exit 1
+			}
+		
+			#Configure a separate WANPIPE device
+			show "Starting up device: $dev" ; busy
+			echo "Starting up device: $dev" >> $ROUTER_LOG
+			router_config $ROUTER_CONF
+			deltext; ok
+		fi
+		;;
+	stop)	
+		
+		#ROUTER STOP
+		if [ -z $2 ]; then
+
+			#Check that all wanpipe#.conf file defined in 
+			# WAN_DEVICES exist
+			check_config || exit 1
+
+			[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
+				echo -e "Router is already stopped !\n"
+				exit 1
+			}
+
+			#Stop all interfaces, but check whether 
+                        #device is running first
+			for dev in $WAN_DEVICES; do
+				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+				check_running $dev || continue
+			done
+
+			#Stop all routers but check if device
+			#is running first
+			for dev in $WAN_DEVICES; do
+				check_running $dev || continue
+				ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+				show "Shutting down device: $dev" ; busy
+				echo "Shutting down device: $dev" >> $ROUTER_LOG
+				router_unconfig $ROUTER_CONF
+				deltext; ok
+			done
+
+
+			#Check if any devices are still running
+			#  If YES: don't unload the modules, just printout
+			#	   the list of active devices
+			#  If NO:  unload modules
+			check_and_print_still_running && exit 0
+
+			echo -e "No devices running, Unloading Modules"
+			router_unload
+
+		else
+		#ROUTER STOP WANPIPE
+
+			dev=$2
+			ROUTER_CONF=$WANPIPE_CONF_DIR/$dev.conf
+
+			#Check that all configuration files exist
+			check_file $ROUTER_CONF || exit 1
+
+			#Check that modules are up and running
+			[ ! -f "$ROUTER_LOCK" -o ! -d "$ROUTER_PROC" ] && {
+				echo -e "Router is already stopped !\n";
+				exit 1;
+			}
+
+
+			#Check that device is running first
+			check_running $dev || {
+					echo -e "Device $dev is already stopped\n"
+					exit 0;
+					}
+
+			#Bring down the interface and router
+			show "Shutting down device: $dev" ; busy
+			echo "Shutting down device: $dev" >> $ROUTER_LOG
+			router_unconfig $ROUTER_CONF
+			deltext ; ok
+
+			#Check if any devices are still running
+			#  If YES: don't unload the modules, just printout
+			#	   the list of active devices
+			#  If NO:  unload modules
+	
+			check_and_print_still_running && exit 0
+
+			cd $ROUTER_HOME
+			echo -e "No devices running, Unloading Modules"
+			router_unload
+
+		fi			
+		;;
+	list|status)
+		
+		[ -f "$ROUTER_LOCK" ] || {
+				echo -e "Router is stopped !\n";
+				exit 1;
+		}
+		
+		echo -e "Devices currently active:"
+		print_active_devices;
+		exit 1;
+
+		;;
+	*)	echo -e "\nWAN Router startup script"
+		echo -e "Usage: $SCRIPT: {start|stop} <wanpipe#> optional\n"
+		echo -e "       wanrouter start : Starts all devices specified in"
+		echo -e "                      $ROUTER_RC WAN_DEVICES\n"
+		echo -e "       wanrouter stop  : Stops all devices specified in"
+		echo -e "                      $ROUTER_RC WAN_DEVICES\n"
+		echo -e "       wanrouter start wanpipe# : Starts only device wanpipe#\n"
+		echo -e "       wanrouter stop wanpipe#  : Stops only device wanpipe#" 
+		echo -e "                               (# can range from 1 to 16)\n"
+		echo -e " 	wanrouter status : List all active devices\n"
+		exit 1
+esac
+exit 0

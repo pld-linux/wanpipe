@@ -6,6 +6,7 @@ Release:	3
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
+# Source0-md5:	d461607e5e2c53018abb1abab43bacd8
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf

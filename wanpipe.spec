@@ -13,6 +13,7 @@ Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
 Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
+Patch2:		%{name}-ncurses.patch
 URL:		http://www.freeciv.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -36,6 +37,7 @@ Menu-driven configuration tools for WANPIPE.
 %setup -qn usr/local/wanrouter
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 rm -f util/bin/*
 rm -f config/ft1/source/ft1_exec
 rm -f config/lxdialog/lxdialog

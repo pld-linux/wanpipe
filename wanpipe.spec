@@ -5,8 +5,6 @@ Version:	2.1.3
 Release:	2
 License:	GPL
 Group:		Applications/System
-Group(de):	Applikationen/System
-Group(pl):	Aplikacje/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
@@ -31,8 +29,6 @@ Narzêdzia do wieloprotoko³owego drivera WANPIPE dla Linuksa.
 Summary:	Configuration tools for wanpipe
 Summary(pl):	Narzêdzia konfiguracyjne do wanpipe
 Group:		Applications/System
-Group(de):	Applikationen/System
-Group(pl):	Aplikacje/System
 Requires:	%{name} = %{version}
 
 %description cfgtools

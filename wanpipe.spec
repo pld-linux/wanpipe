@@ -44,10 +44,10 @@ cd util
 %{__make} OUTDIR=bin
 
 cd ../config/ft1/source
-make
+%{__make}
 
 cd ../../lxdialog
-make
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT

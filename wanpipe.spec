@@ -1,12 +1,13 @@
+%define	_rel	0
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	2.1.3
-Release:	3
+Version:	2.3.0
+Release:	0.1
 License:	GPL
 Group:		Applications/System
-Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	d461607e5e2c53018abb1abab43bacd8
+Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{_rel}.tgz
+# Source0-md5:	a32afcb9f62aed0556f15b1d965e27e1
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -39,7 +40,7 @@ Menu-driven configuration tools for WANPIPE.
 Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 
 %prep
-%setup -qn usr/local/wanrouter
+%setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1

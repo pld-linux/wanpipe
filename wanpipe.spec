@@ -13,7 +13,7 @@ Source3:	wanpipe1.conf
 URL:		http://www.freeciv.org/
 Icon:		freeciv.gif
 Requires:	kernel >= 2.2.14
-Buildroot:	/tmp/%{name}-%{version}-root
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 Multi-protocol WANPIPE Driver utilities for Linux Operating System
@@ -62,7 +62,6 @@ if [ "$1" = "0" ]; then
         fi
         /sbin/chkconfig --del wanrouter
 fi
-
 
 %files 
 %defattr(644,root,root,755)

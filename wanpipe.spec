@@ -2,7 +2,7 @@ Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.1.3
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications/System
 Group(de):	Applikationen/System
@@ -17,11 +17,15 @@ Patch2:		%{name}-ncurses.patch
 URL:		http://www.freeciv.org/
 Buildrequires:	ncurses-devel >= 5.2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+Prereq:		/sbin/chkconfig
 
 %define		_sysconfdir	/etc/wanpipe
 
 %description
 Multi-protocol WANPIPE Driver utilities for Linux Operating System.
+
+%description -l pl
+Narzêdzia do wieloprotoko³owego drivera WANPIPE dla Linuksa.
 
 %package cfgtools
 Summary:	Configuration tools for wanpipe
@@ -33,6 +37,9 @@ Requires:	%{name} = %{version}
 
 %description cfgtools
 Menu-driven configuration tools for WANPIPE.
+
+%description cfgtools -l pl
+Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 
 %prep
 %setup -qn usr/local/wanrouter
@@ -81,7 +88,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add wanrouter
-
 if [ -f /var/lock/subsys/wanrouter ]; then
         /etc/rc.d/init.d/wanrouter restart 1>&2
 else

@@ -99,7 +99,7 @@ if [ "$1" = "0" ]; then
         /sbin/chkconfig --del wanrouter
 fi
 
-%files 
+%files
 %defattr(644,root,root,755)
 %doc README.gz doc/* samples/*.gz
 %dir %{_sysconfdir}

@@ -20,10 +20,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Multi-protocol WANPIPE Driver utilities for Linux Operating System.
 
 %package cfgtools
-Summary:        Configuration tools for wanpipe
-Group:          Utilities/System
-Group(pl):      Narzêdzia/System
-Requires:       %{name} = %{version}
+Summary:	Configuration tools for wanpipe
+Group:		Utilities/System
+Group(pl):	Narzêdzia/System
+Requires:	%{name} = %{version}
 
 %description cfgtools
 Menu-driven configuration tools for WANPIPE.

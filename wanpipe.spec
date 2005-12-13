@@ -16,8 +16,8 @@ Patch1:		%{name}-opt.patch
 Patch2:		%{name}-bins_sh.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	ncurses-devel >= 5.2
-PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
+Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/wanpipe
@@ -102,8 +102,8 @@ fi
 %attr(755,root,root) %{_sbindir}/wpbwm
 %attr(755,root,root) %{_sbindir}/wp_pppconfig
 %dir %{_sysconfdir}
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/wanrouter
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/wanrouter
 %attr(754,root,root) /etc/rc.d/init.d/wanrouter
 %dir %{_datadir}/wanrouter
 %{_datadir}/wanrouter/firmware

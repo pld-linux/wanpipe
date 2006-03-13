@@ -16,6 +16,7 @@ Patch1:		%{name}-opt.patch
 Patch2:		%{name}-bins_sh.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	ncurses-devel >= 5.2
+BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -78,18 +79,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add wanrouter
-if [ -f /var/lock/subsys/wanrouter ]; then
-	/etc/rc.d/init.d/wanrouter restart 1>&2
-else
-	echo "Edit configuration files in /etc/wanpipe and /etc/sysconfig/interfaces"
-	echo "and type \"/etc/rc.d/init.d/wanrouter start\" to start wanrouter" 1>&2
+%service wanrouter restart
+if [ "$1" = 1 ]; then
+	echo "Edit configuration files in %{_sysconfdir} and /etc/sysconfig/interfaces"
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/wanrouter ]; then
-		/etc/rc.d/init.d/wanrouter stop 1>&2
-	fi
+	%service wanrouter stop
 	/sbin/chkconfig --del wanrouter
 fi
 

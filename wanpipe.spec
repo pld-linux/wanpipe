@@ -1,9 +1,10 @@
+%define	subver	9
+%define	_rel	4
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.3.0
-%define	subver	9
-Release:	%{subver}.3
+Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz

@@ -1,14 +1,14 @@
-%define	subver	9
-%define	_rel	4
+%define	subver	3
+%define	_rel	0.1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	2.3.0
+Version:	2.3.3
 Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
-# Source0-md5:	f8ff399a2f9bb0afc3be418e401e7b30
+# Source0-md5:	64c7aa7184d408e04304bba17de2ab9a
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -46,12 +46,12 @@ Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 %setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p0
+#%patch2 -p0
 
 ln -sf . patches/kdrivers/include/linux
 
 # hack to omit searching libncurses.so in somedirs/lib
-touch util/lxdialog/ncurses
+#touch util/lxdialog/ncurses
 
 %build
 %{__make} -C util \
@@ -67,7 +67,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},/etc/{rc.d/init.d,sysconfig},/var/log}
 	WAN_VIRTUAL=$RPM_BUILD_ROOT
 
 install firmware/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/firmware
-install util/wancfg/lib/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/wancfg
+#install util/wancfg/lib/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/wancfg
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter

@@ -1,3 +1,12 @@
+
+%bcond_without	dist_kernel	# allow non-distribution kernel
+%bcond_without	kernel		# don't build kernel modules
+%bcond_without	smp		# don't build SMP module
+
+%if %{without kernel}
+%undefine	with_dist_kernel
+%endif
+
 %define	subver	3
 %define	_rel	0.1
 Summary:	WAN routing package for Sangoma cards
@@ -14,10 +23,13 @@ Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
 Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
-Patch2:		%{name}-bins_sh.patch
+Patch2:		%{name}-setup.patch
 URL:		http://www.sangoma.com/
+%if %{with kernel}
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
+%endif
 BuildRequires:	ncurses-devel >= 5.2
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.308
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -42,18 +54,67 @@ Menu-driven configuration tools for WANPIPE.
 %description cfgtools -l pl
 Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 
+%package -n kernel%{_alt_kernel}-%{name}
+Summary:	Linux driver for WANPIPE
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+Requires(post,postun):	/sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel_up
+Requires(postun):	%releq_kernel_up
+%endif
+
+%description -n kernel%{_alt_kernel}-%{name}
+This is driver for WANPIPE.
+This package contains Linux module.
+
+%package -n kernel%{_alt_kernel}-smp-%{name}
+Summary:	Linux SMP driver for WANPIPE
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+Requires(post,postun):	/sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel_smp
+Requires(postun):	%releq_kernel_smp
+%endif
+
+%description -n kernel%{_alt_kernel}-smp-%{name}
+This is driver for WANPIPE.
+This package contains Linux SMP module.
+
 %prep
 %setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
-#%patch2 -p0
+%patch2 -p1
 
 ln -sf . patches/kdrivers/include/linux
 
-# hack to omit searching libncurses.so in somedirs/lib
-#touch util/lxdialog/ncurses
-
 %build
+
+%if %{with kernel}
+for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
+	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
+		exit 1
+	fi
+	rm -rf o
+	install -d o/include/{linux,config}
+	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} o/include/asm
+
+	%{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
+
+	mkdir modules-$cfg
+        echo -e 'y\n\ny\n2\n\n\n\n\n\ny\ny\n\n\n\n' | \
+        ./Setup drivers \
+		--no-gcc-debug \
+  		--with-linux=$PWD/o \
+  		--builddir=$PWD/modules-$cfg
+done
+%endif
+
 %{__make} -C util \
 	CC="%{__cc}" \
 	OPTFLAGS="%{rpmcflags}"
@@ -74,6 +135,24 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 
 touch $RPM_BUILD_ROOT/var/log/wanrouter
+
+%if %{with kernel}
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/kernel/{net/wanrouter,drivers/net/wan}
+
+install  modules-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}/lib/modules/*/kernel/net/wanrouter/*.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter
+
+install  modules-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}/lib/modules/*/kernel/drivers/net/wan/*.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan
+%if %{with smp} && %{with dist_kernel}
+
+install  modules-smp/lib/modules/*/kernel/net/wanrouter/*.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/kernel/net/wanrouter
+
+install  modules-smp/lib/modules/*/kernel/drivers/net/wan/*.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/kernel/drivers/net/wan
+%endif
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -114,3 +193,17 @@ fi
 %attr(755,root,root) %{_sbindir}/wanpipe_ft1exec
 %attr(755,root,root) %{_sbindir}/wanpipe_lxdialog
 %{_datadir}/wanrouter/wancfg
+
+%if %{with kernel}
+%files -n kernel%{_alt_kernel}-%{name}
+%defattr(644,root,root,755)
+/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/*.ko*
+/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan/*.ko*
+
+%if %{with smp} && %{with dist_kernel}
+%files -n kernel%{_alt_kernel}-smp-%{name}
+%defattr(644,root,root,755)
+/lib/modules/%{_kernel_ver}smp/kernel/net/wanrouter/*.ko*
+/lib/modules/%{_kernel_ver}smp/kernel/drivers/net/wan/*.ko*
+%endif
+%endif

@@ -7,7 +7,7 @@
 %undefine	with_dist_kernel
 %endif
 
-%define	subver	3
+%define	subver	7
 %define	_rel	0.1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
@@ -17,7 +17,7 @@ Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
-# Source0-md5:	64c7aa7184d408e04304bba17de2ab9a
+# Source0-md5:	45869497ece2f664c1921132c3308bcd
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf

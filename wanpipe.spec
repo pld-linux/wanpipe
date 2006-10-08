@@ -1,8 +1,9 @@
-
+#
+# Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	smp		# don't build SMP module
-
+#
 %if %{without kernel}
 %undefine	with_dist_kernel
 %endif
@@ -56,6 +57,7 @@ Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
 
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Linux driver for WANPIPE
+Summary(pl):	Sterownik WANPIPE dla Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -65,11 +67,14 @@ Requires(postun):	%releq_kernel_up
 %endif
 
 %description -n kernel%{_alt_kernel}-%{name}
-This is driver for WANPIPE.
-This package contains Linux module.
+This package contains WANPIPE module for Linux.
+
+%description -n kernel%{_alt_kernel}-%{name} -l pl
+Ten pakiet zawiera modu³ WANPIPE dla Linuksa.
 
 %package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Linux SMP driver for WANPIPE
+Summary(pl):	Sterownik WANPIPE dla Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -79,8 +84,10 @@ Requires(postun):	%releq_kernel_smp
 %endif
 
 %description -n kernel%{_alt_kernel}-smp-%{name}
-This is driver for WANPIPE.
-This package contains Linux SMP module.
+This package contains WANPIPE module for Linux SMP.
+
+%description -n kernel%{_alt_kernel}-smp-%{name} -l pl
+Ten pakiet zawiera modu³ WANPIPE dla Linuksa SMP.
 
 %prep
 %setup -q -n %{name}

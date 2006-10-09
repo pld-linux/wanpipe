@@ -9,7 +9,7 @@
 %endif
 
 %define	subver	7
-%define	_rel	0.1
+%define	_rel	1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
@@ -111,14 +111,14 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
 	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} o/include/asm
 
-	%{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
+	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 
 	mkdir modules-$cfg
-        echo -e 'y\n\ny\n2\n\n\n\n\n\ny\ny\n\n\n\n' | \
-        ./Setup drivers \
-		--no-gcc-debug \
-  		--with-linux=$PWD/o \
-  		--builddir=$PWD/modules-$cfg
+	echo -e 'y\n\ny\n2\n\n\n\n\n\ny\ny\n\n\n\n' | \
+	./Setup drivers \
+	--no-gcc-debug \
+	--with-linux=$PWD/o \
+	--builddir=$PWD/modules-$cfg
 done
 %endif
 

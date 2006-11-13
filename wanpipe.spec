@@ -4,7 +4,7 @@
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	smp		# don't build SMP module
 #
-%if %{without kernel}
+%if !%{with kernel}
 %undefine	with_dist_kernel
 %endif
 

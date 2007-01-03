@@ -6,23 +6,23 @@
  #
  # Setup		WANPIPE WAN Router Installation/Removal Script.
  #
-@@ -2921,15 +2921,6 @@
- 		CONFIG_SMP=YES;
+@@ -3139,15 +3139,6 @@
+ 		CONFIG_SMP=YES;  
  	else	
  		echo -e "Disabled.\n"
 -		eval "uname -a |grep SMP > /dev/null 2> /dev/null"
 -		if [ $? -eq 0 ]; then
 -			echo
 -			echo "   Warning: Current image is configured for SMP"
--			getyn "   Would you like to cancel installation?"
--			if [ $? -eq 0 ]; then
+-			getyn "  Would you like to proceed with installation?"
+-			if [ $? -ne 0 ]; then
 -				exit 1
 -			fi 
 -		fi
  		CONFIG_SMP=NO;
  	fi
  
-@@ -5574,11 +5565,6 @@
+@@ -6204,11 +6195,6 @@
  fi
  LINUXDRIVERS_WAN="net/wanrouter"
  

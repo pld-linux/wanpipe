@@ -8,17 +8,17 @@
 %undefine	with_dist_kernel
 %endif
 
-%define	subver	7
+%define	subver	3
 %define	_rel	1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	2.3.3
+Version:	2.3.4
 Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
-# Source0-md5:	45869497ece2f664c1921132c3308bcd
+# Source0-md5:	3ce1eaeeda445cd8811e93cad568c12d
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -95,6 +95,11 @@ Ten pakiet zawiera modu³ WANPIPE dla Linuksa SMP.
 %patch1 -p1
 %patch2 -p1
 
+#ugly speedhack
+mkdir util/wanec_client/tmp
+cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
+cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
+
 ln -sf . patches/kdrivers/include/linux
 
 %build
@@ -111,10 +116,14 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
 	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} o/include/asm
 
+	#ugly speedhack
+	cp patches/kdrivers/wanec/wanec_iface.h o/include/
+	cp -a patches/kdrivers/wanec/oct6100_api.PR43/include/* o/include/
+
 	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 
 	mkdir modules-$cfg
-	echo -e 'y\n\ny\n2\n\n\n\n\n\ny\ny\n\n\n\n' | \
+	echo -e 'y\n\ny\n2\n/usr/include/zaptel\ny\n\n\n\n\ny\ny\n\n\n\n' | \
 	./Setup drivers \
 	--no-gcc-debug \
 	--with-linux=$PWD/o \

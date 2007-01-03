@@ -24,26 +24,25 @@
  
 --- wanpipe/util/wanpipemon/Makefile.orig	2004-01-15 17:10:28.000000000 +0100
 +++ wanpipe/util/wanpipemon/Makefile	2004-04-09 18:41:11.266531856 +0200
-@@ -12,9 +12,6 @@
+@@ -12,8 +12,6 @@
  
  PROD=wanpipemon
  
--SYSINC=$(shell if [ -d /lib/modules/$(uname -r)/build/include ]; then echo "/lib/modules/$(uname -r)/build/include" else echo "/usr/src/linux/include"; fi)
--SYSINC=$(shell echo "/lib/modules/$(uname -r)/build/include")
--
+-SYSINC=$(shell if [ -d /lib/modules/$(shell uname -r)/build/include ]; then echo "/lib/modules/$(shell uname -r)/build/include" else echo "/usr/src/linux/include"; fi)
+-SYSINC=$(shell echo "/lib/modules/$(shell uname -r)/build/include")
+ 
  WAN_VIRTUAL=
  LXDIR=../lxdialog
- ENABLE_GUI=YES
-@@ -23,14 +20,15 @@
+@@ -22,15 +20,14 @@
+ PROTOCOL_DEFS=
  ASTBROOT=/usr
  #-DCONFIG_PRODUCT_WANPIPE_ADSL
- 
+-
 +HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
-+
  CC = gcc 
  CPP = gcc -E
 -CFLAGS = -Wall -Wstrict-prototypes -I$(SYSINC) -D$(OS_TYPE) -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
-+OPTFLAGS=-O2
++OPTFLAGS=-O2    
 +CFLAGS = -Wall $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
  LDFLAGS = -s -L .
  WAN_VIRTUAL=
@@ -71,9 +70,9 @@
  DEBUG	= 2
  
  # Project file paths.
--SYSINC = /usr/include
+-SYSINC=/lib/modules/$(shell uname -r)/build/include
 -
--HOSTCFLAGS=-I/usr/include
+-HOSTCFLAGS=-I/usr/src/linux/include 
 +HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
  ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
          HOSTCFLAGS += -I/usr/include/ncurses
@@ -102,37 +101,29 @@
  	rm wpbwm
 --- wanpipe/util/lxdialog/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
 +++ wanpipe/util/lxdialog/Makefile	2004-04-09 18:39:10.810843904 +0200
-@@ -3,13 +3,14 @@
+@@ -1,15 +1,14 @@
+ CC = gcc 
+ CPP = gcc -E
  #Will be overwritten by ./Setup
- SYSINC=/usr/src/linux/include
+-SYSINC=/lib/modules/$(shell uname -r)/build/include
  
 -CFLAGS = -Wall -Wstrict-prototypes -I$(SYSINC) -O2 -fomit-frame-pointer -DLOCALE 
-+OPTFLAGS=-O2 -fomit-frame-pointer
++OPTFLAGS=-O2 -fomit-frame-pointer                                              
 +CFLAGS = -Wall -Wstrict-prototypes $(OPTFLAGS) -DLOCALE -I/usr/include/ncurses
  LDFLAGS = -s -L .
  LDLIBS = -lncurses
  WAN_VIRTUAL=
- ASTBROOT=/usr
-
--CFLAGS += -I$(ASTBROOT)/include -DCURSES_LOC="<ncurses.h>"
-+CFLAGS += -I$(ASTBROOT)/include -DCURSES_LOC="<ncurses.h>"
-
+ 
+ CFLAGS += -I$(ASTBROOT)/include -DCURSES_LOC="<ncurses.h>"
+-
  #ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
  #        CFLAGS += -I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"
+ #else
 --- wanpipe/util/Makefile.org	2006-06-10 22:56:52.165416750 +0000
 +++ wanpipe/util/Makefile	2006-06-10 22:56:59.481874000 +0000
 @@ -1,4 +1,4 @@
--SYSINC=/usr/src/linux/include
+-SYSINC=/lib/modules/$(shell uname -r)/build/include
 +SYSINC="../../patches/kdrivers/include -I/usr/include/ncurses"
  
  all:
- 	make -C ft1 all #SYSINC=$(SYSINC) 
-@@ -7,7 +7,7 @@
- 	make -C wanconfig all SYSINC=$(SYSINC)
- 	make -C wanpipemon all SYSINC=$(SYSINC) PROTOCOL_DEFS=$(PROTOCOL_DEFS) ENABLE_WANPIPEMON_ZAP=$(ENABLE_WANPIPEMON_ZAP)  
- 	make -C wanpipemon_legacy all SYSINC=$(SYSINC) PROTOCOL_DEFS=$(PROTOCOL_DEFS) 
--#	make -C wancfg all SYSINC=$(SYSINC) 
-+	make -C wancfg all SYSINC=$(SYSINC) 
- 	make -C bwm all SYSINC=$(SYSINC) PROTOCOL_DEFS=$(PROTOCOL_DEFS)
- 
- install:
+ 	make -C ft1 all SYSINC=$(SYSINC) 

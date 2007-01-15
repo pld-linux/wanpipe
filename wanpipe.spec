@@ -8,7 +8,7 @@
 %undefine	with_dist_kernel
 %endif
 
-%define	subver	3
+%define	subver	4
 %define	_rel	1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
@@ -18,7 +18,7 @@ Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
-# Source0-md5:	3ce1eaeeda445cd8811e93cad568c12d
+# Source0-md5:	c77e6ba5b62ddd79acd7b1249c950cec
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -119,12 +119,13 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	#ugly speedhack
 	cp patches/kdrivers/wanec/wanec_iface.h o/include/
 	cp -a patches/kdrivers/wanec/oct6100_api.PR43/include/* o/include/
+	ln -sf %{_kernelsrcdir}/include/linux/fs.h o/include/linux/fs.h
 
 	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 
 	mkdir modules-$cfg
 	echo -e 'y\n\ny\n2\n/usr/include/zaptel\ny\n\n\n\n\ny\ny\n\n\n\n' | \
-	./Setup drivers \
+	bash -x ./Setup drivers \
 	--no-gcc-debug \
 	--with-linux=$PWD/o \
 	--builddir=$PWD/modules-$cfg

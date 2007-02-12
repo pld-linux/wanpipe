@@ -11,7 +11,7 @@
 %define	subver	4
 %define	_rel	1
 Summary:	WAN routing package for Sangoma cards
-Summary(pl):	Pakiet do rutingu WAN dla kart Sangoma
+Summary(pl.UTF-8):   Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.3.4
 Release:	%{subver}.%{_rel}
@@ -40,24 +40,24 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Multi-protocol WANPIPE Driver utilities for Linux Operating System.
 
-%description -l pl
-Narzêdzia do wieloprotoko³owego sterownika WANPIPE dla Linuksa.
+%description -l pl.UTF-8
+NarzÄ™dzia do wieloprotokoÅ‚owego sterownika WANPIPE dla Linuksa.
 
 %package cfgtools
 Summary:	Configuration tools for wanpipe
-Summary(pl):	Narzêdzia konfiguracyjne do wanpipe
+Summary(pl.UTF-8):   NarzÄ™dzia konfiguracyjne do wanpipe
 Group:		Applications/System
 Requires:	%{name} = %{version}-%{release}
 
 %description cfgtools
 Menu-driven configuration tools for WANPIPE.
 
-%description cfgtools -l pl
-Narzêdzia konfiguracyjne do WANPIPE w postaci menu.
+%description cfgtools -l pl.UTF-8
+NarzÄ™dzia konfiguracyjne do WANPIPE w postaci menu.
 
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Linux driver for WANPIPE
-Summary(pl):	Sterownik WANPIPE dla Linuksa
+Summary(pl.UTF-8):   Sterownik WANPIPE dla Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -69,12 +69,12 @@ Requires(postun):	%releq_kernel_up
 %description -n kernel%{_alt_kernel}-%{name}
 This package contains WANPIPE module for Linux.
 
-%description -n kernel%{_alt_kernel}-%{name} -l pl
-Ten pakiet zawiera modu³ WANPIPE dla Linuksa.
+%description -n kernel%{_alt_kernel}-%{name} -l pl.UTF-8
+Ten pakiet zawiera moduÅ‚ WANPIPE dla Linuksa.
 
 %package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Linux SMP driver for WANPIPE
-Summary(pl):	Sterownik WANPIPE dla Linuksa SMP
+Summary(pl.UTF-8):   Sterownik WANPIPE dla Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -86,8 +86,8 @@ Requires(postun):	%releq_kernel_smp
 %description -n kernel%{_alt_kernel}-smp-%{name}
 This package contains WANPIPE module for Linux SMP.
 
-%description -n kernel%{_alt_kernel}-smp-%{name} -l pl
-Ten pakiet zawiera modu³ WANPIPE dla Linuksa SMP.
+%description -n kernel%{_alt_kernel}-smp-%{name} -l pl.UTF-8
+Ten pakiet zawiera moduÅ‚ WANPIPE dla Linuksa SMP.
 
 %prep
 %setup -q -n %{name}

@@ -11,7 +11,7 @@
 %define	subver	4
 %define	_rel	1
 Summary:	WAN routing package for Sangoma cards
-Summary(pl.UTF-8):   Pakiet do rutingu WAN dla kart Sangoma
+Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	2.3.4
 Release:	%{subver}.%{_rel}
@@ -45,7 +45,7 @@ Narzędzia do wieloprotokołowego sterownika WANPIPE dla Linuksa.
 
 %package cfgtools
 Summary:	Configuration tools for wanpipe
-Summary(pl.UTF-8):   Narzędzia konfiguracyjne do wanpipe
+Summary(pl.UTF-8):	Narzędzia konfiguracyjne do wanpipe
 Group:		Applications/System
 Requires:	%{name} = %{version}-%{release}
 
@@ -57,7 +57,7 @@ Narzędzia konfiguracyjne do WANPIPE w postaci menu.
 
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Linux driver for WANPIPE
-Summary(pl.UTF-8):   Sterownik WANPIPE dla Linuksa
+Summary(pl.UTF-8):	Sterownik WANPIPE dla Linuksa
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -74,7 +74,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 
 %package -n kernel%{_alt_kernel}-smp-%{name}
 Summary:	Linux SMP driver for WANPIPE
-Summary(pl.UTF-8):   Sterownik WANPIPE dla Linuksa SMP
+Summary(pl.UTF-8):	Sterownik WANPIPE dla Linuksa SMP
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod

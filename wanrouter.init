@@ -211,7 +211,7 @@ print_active_devices()
 	cd $ROUTER_PROC
 	ac_list=`ls wanpipe*`
 	for ac_wan in $ac_list; do
-		res=`grep "Device is not configured" $ROUTER_PROC/$ac_wan 2> /dev/null`
+		res=`grep "device is not configured!" $ROUTER_PROC/$ac_wan 2> /dev/null`
 		[ -z "$res" ] && {
 			echo -n "$ac_wan "
 		}
@@ -445,15 +445,15 @@ wansock_config ()
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin
 ROUTER_VERSION=2.1.3
 ROUTER_RC=/etc/sysconfig/wanrouter
-ROUTER_HOME=/usr/lib/wanrouter
+ROUTER_HOME=/etc/wanpipe
 SCRIPT=wanrouter
 ROUTER_PROC=/proc/net/wanrouter
 WAN_DRIVERS=wanpipe
 AF_WANPIPE=af_wanpipe
-MOD1=/lib/modules/$(uname -r)/misc/wanrouter.o
-MOD2=/lib/modules/$(uname -r)/net/wanpipe.o
-MOD3=/lib/modules/$(uname -r)/net/sdladrv.o
-MOD4=/lib/modules/$(uname -r)/misc/af_wanpipe.o
+MOD1=/lib/modules/$(uname -r)/kernel/net/wanrouter/wanrouter.ko.gz
+MOD2=/lib/modules/$(uname -r)/kernel/drivers/net/wan/wanpipe.ko.gz
+MOD3=/lib/modules/$(uname -r)/kernel/drivers/net/wan/sdladrv.ko.gz
+MOD4=/lib/modules/$(uname -r)/kernel/net/wanrouter/af_wanpipe.ko.gz
 
 # Return code
 RC=$(pwd)/return_code

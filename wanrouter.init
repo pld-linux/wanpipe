@@ -450,10 +450,11 @@ SCRIPT=wanrouter
 ROUTER_PROC=/proc/net/wanrouter
 WAN_DRIVERS=wanpipe
 AF_WANPIPE=af_wanpipe
-MOD1=/lib/modules/$(uname -r)/kernel/net/wanrouter/wanrouter.ko.gz
-MOD2=/lib/modules/$(uname -r)/kernel/drivers/net/wan/wanpipe.ko.gz
-MOD3=/lib/modules/$(uname -r)/kernel/drivers/net/wan/sdladrv.ko.gz
-MOD4=/lib/modules/$(uname -r)/kernel/net/wanrouter/af_wanpipe.ko.gz
+uname_r=$(uname -r)
+MOD1=/lib/modules/$uname_r/kernel/net/wanrouter/wanrouter.ko.gz
+MOD2=/lib/modules/$uname_r/kernel/drivers/net/wan/wanpipe.ko.gz
+MOD3=/lib/modules/$uname_r/kernel/drivers/net/wan/sdladrv.ko.gz
+MOD4=/lib/modules/$uname_r/kernel/net/wanrouter/af_wanpipe.ko.gz
 
 # Return code
 RC=$(pwd)/return_code

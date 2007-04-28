@@ -28,30 +28,27 @@
  
  PROD=wanpipemon
  
--SYSINC=$(shell if [ -d /lib/modules/$(shell uname -r)/build/include ]; then echo "/lib/modules/$(shell uname -r)/build/include" else echo "/usr/src/linux/include"; fi)
 -SYSINC=$(shell echo "/lib/modules/$(shell uname -r)/build/include")
- 
+-
  WAN_VIRTUAL=
  LXDIR=../lxdialog
-@@ -22,15 +20,14 @@
- PROTOCOL_DEFS=
+ ENABLE_GUI=YES
+@@ -23,11 +21,14 @@
  ASTBROOT=/usr
  #-DCONFIG_PRODUCT_WANPIPE_ADSL
--
+ 
 +HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
  CC = gcc 
  CPP = gcc -E
--CFLAGS = -Wall -Wstrict-prototypes -I$(SYSINC) -D$(OS_TYPE) -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
-+OPTFLAGS=-O2    
-+CFLAGS = -Wall $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
- LDFLAGS = -s -L .
+ CFLAGS = -Wall -Wstrict-prototypes 
+ CFLAGS += $(EXTRA_FLAGS)
+-CFLAGS += -I$(SYSINC) -D$(OS_TYPE) -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG)
++OPTFLAGS=-O2
++CFLAGS =  $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
++
  WAN_VIRTUAL=
  
--
--HOSTCFLAGS=-I$(SYSINC)
- #ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
- #        HOSTCFLAGS += -I/usr/include/ncurses
- #else
+ 
 --- wanpipe/util/sdladump/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
 +++ wanpipe/util/sdladump/Makefile	2004-04-09 18:39:45.744533176 +0200
 @@ -13,7 +13,8 @@
@@ -66,24 +63,18 @@
  ####### RULES ################################################################
 --- wanpipe/util/ft1/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
 +++ wanpipe/util/ft1/Makefile	2004-04-09 18:38:37.559898816 +0200
-@@ -11,9 +11,7 @@
+@@ -11,10 +11,12 @@
  DEBUG	= 2
  
  # Project file paths.
 -SYSINC=/lib/modules/$(shell uname -r)/build/include
--
--HOSTCFLAGS=-I/usr/src/linux/include 
 +HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
- ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
-         HOSTCFLAGS += -I/usr/include/ncurses
- else
-@@ -24,7 +22,8 @@
- endif
  
  # Tools options.
--CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS) 
+-CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG)  
 +OPTFLAGS=-O2
-+CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS) 
++CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
++
  LIBS = -lncurses
  
  ####### RULES ################################################################
@@ -121,9 +112,10 @@
  #else
 --- wanpipe/util/Makefile.org	2006-06-10 22:56:52.165416750 +0000
 +++ wanpipe/util/Makefile	2006-06-10 22:56:59.481874000 +0000
-@@ -1,4 +1,4 @@
--SYSINC=/lib/modules/$(shell uname -r)/build/include
+@@ -1,5 +1,5 @@
+ PWD=$(shell pwd)
+-SYSINC=$(PWD)/../patches/kdrivers/include
 +SYSINC="../../patches/kdrivers/include -I/usr/include/ncurses"
+ KDIR=/lib/modules/$(shell uname -r)/build
  
- all:
- 	make -C ft1 all SYSINC=$(SYSINC) 
+ WAN_VIRTUAL=$(PREFIX)

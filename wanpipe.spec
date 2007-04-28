@@ -8,7 +8,7 @@
 %undefine	with_dist_kernel
 %endif
 
-%define	subver	7
+%define	subver	8
 %define	_rel	1
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
@@ -18,7 +18,7 @@ Release:	%{subver}.%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}-%{subver}.tgz
-# Source0-md5:	8fe750ce39ff0c79af27bc503e75f69c
+# Source0-md5:	8c0b63c07cbee3ecec32bcc41d27e8ff
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -90,7 +90,7 @@ This package contains WANPIPE module for Linux SMP.
 Ten pakiet zawiera moduł WANPIPE dla Linuksa SMP.
 
 %prep
-%setup -q -n %{name}
+%setup -q -n %{name}-%{version}-%{subver}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -100,7 +100,7 @@ mkdir util/wanec_client/tmp
 cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
 cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
 
-ln -sf . patches/kdrivers/include/linux
+#ln -sf . patches/kdrivers/include/linux
 
 %build
 
@@ -134,7 +134,7 @@ done
 
 %{__make} -C util \
 	CC="%{__cc}" \
-	OPTFLAGS="%{rpmcflags}"
+	OPTFLAGS="%{rpmcflags}" all all_wancfg
 
 %install
 rm -rf $RPM_BUILD_ROOT

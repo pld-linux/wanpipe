@@ -22,15 +22,3 @@
  		CONFIG_SMP=NO;
  	fi
  
-@@ -6204,11 +6195,6 @@
- fi
- LINUXDRIVERS_WAN="net/wanrouter"
- 
--[ "$UID" = 0 ] || {
--	error "You must be a superuser (root) to run this script"
--	exit 1
--}
--
- # Check router home directory.
- [ -d "$PROD_HOME" ] || {
- 	error "Router home directory ($PROD_HOME) not found"

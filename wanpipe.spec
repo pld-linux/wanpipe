@@ -132,9 +132,9 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 done
 %endif
 
-%{__make} -C util \
+%{__make} -C util all all_wancfg \
 	CC="%{__cc}" \
-	OPTFLAGS="%{rpmcflags}" all all_wancfg
+	OPTFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT

@@ -110,12 +110,12 @@
  #ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
  #        CFLAGS += -I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"
  #else
---- wanpipe/util/Makefile.org	2006-06-10 22:56:52.165416750 +0000
-+++ wanpipe/util/Makefile	2006-06-10 22:56:59.481874000 +0000
+--- wanpipe/util/Makefile.orig	2007-03-22 00:27:29.000000000 +0000
++++ wanpipe/util/Makefile	2007-10-10 22:03:32.603992707 +0000
 @@ -1,5 +1,5 @@
  PWD=$(shell pwd)
 -SYSINC=$(PWD)/../patches/kdrivers/include
 +SYSINC="../../patches/kdrivers/include -I/usr/include/ncurses"
- KDIR=/lib/modules/$(shell uname -r)/build
- 
  WAN_VIRTUAL=$(PREFIX)
+ WANINCDIR=/usr/include/wanpipe
+ ARCH=$(shell uname -m)

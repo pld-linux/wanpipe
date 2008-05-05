@@ -30,6 +30,7 @@ URL:		http://www.sangoma.com/
 %endif
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
+BuildRequires:	zaptel-devel >= 1.4.8
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)

@@ -12,43 +12,38 @@
  ####### RULES ################################################################
 --- wanpipe/util/wanconfig/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
 +++ wanpipe/util/wanconfig/Makefile	2004-04-09 18:40:07.506224896 +0200
-@@ -15,7 +15,8 @@
+@@ -17,7 +17,8 @@
  WAN_VIRTUAL=
  
  # Tools options.
--CFLAGS  = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -D_DEBUG_=$(DEBUG)
+-CFLAGS  = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -I../../patches/kdrivers/include -D_DEBUG_=$(DEBUG)
 +OPTFLAGS=-O2
 +CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -I/usr/include/ncurses -I../../patches/kdrivers/include -D_DEBUG_=$(DEBUG)
  
- ####### RULES ################################################################
+ CFLAGS += -DWAN_HWEC
  
 --- wanpipe/util/wanpipemon/Makefile.orig	2004-01-15 17:10:28.000000000 +0100
 +++ wanpipe/util/wanpipemon/Makefile	2004-04-09 18:41:11.266531856 +0200
-@@ -12,8 +12,6 @@
+@@ -12,7 +12,7 @@
  
  PROD=wanpipemon
  
--SYSINC=$(shell echo "/lib/modules/$(shell uname -r)/build/include")
--
+-SYSINC=/lib/modules/$(shell uname -r)/build/include
++HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
+ 
  WAN_VIRTUAL=
  LXDIR=../lxdialog
- ENABLE_GUI=YES
-@@ -23,11 +21,14 @@
- ASTBROOT=/usr
- #-DCONFIG_PRODUCT_WANPIPE_ADSL
- 
-+HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
- CC = gcc 
+@@ -27,7 +27,8 @@
  CPP = gcc -E
  CFLAGS = -Wall -Wstrict-prototypes 
  CFLAGS += $(EXTRA_FLAGS)
 -CFLAGS += -I$(SYSINC) -D$(OS_TYPE) -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG)
-+OPTFLAGS=-O2
-+CFLAGS =  $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
-+
++OPTFLAGS=-O2                                                                                                                     
++CFLAGS = $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)  
  WAN_VIRTUAL=
  
  
+
 --- wanpipe/util/sdladump/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
 +++ wanpipe/util/sdladump/Makefile	2004-04-09 18:39:45.744533176 +0200
 @@ -13,7 +13,8 @@
@@ -71,7 +66,7 @@
 +HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
  
  # Tools options.
--CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG)  
+-CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I../../patches/kdrivers/include 
 +OPTFLAGS=-O2
 +CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
 +

@@ -7,13 +7,13 @@
 %undefine	with_dist_kernel
 %endif
 
-%define	_rel    0.1
+%define		rel    0.1
 
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	3.2.5
-Release:	%{_rel}
+Release:	%{rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
@@ -25,9 +25,9 @@ Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
 URL:		http://www.sangoma.com/
-%if %{with kernel}
+BuildRequires:	bison
+BuildRequires:	flex
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.22}
-%endif
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	zaptel-devel >= 1.4.8
@@ -58,7 +58,7 @@ Narzędzia konfiguracyjne do WANPIPE w postaci menu.
 %package -n kernel%{_alt_kernel}-%{name}
 Summary:	Linux driver for WANPIPE
 Summary(pl.UTF-8):	Sterownik WANPIPE dla Linuksa
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
@@ -83,10 +83,7 @@ mkdir util/wanec_client/tmp
 cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
 cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
 
-#ln -sf . patches/kdrivers/include/linux
-
 %build
-
 
 %if %{with kernel}
 	cfg=%{!?with_dist_kernel:non}dist
@@ -94,15 +91,10 @@ cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
 	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} o/include/asm
-
-	#ugly speedhack
-	cp patches/kdrivers/wanec/wanec_iface.h o/include/
-#	cp -a patches/kdrivers/wanec/oct6100_api.PR43/include/* o/include/
-	ln -sf %{_kernelsrcdir}/include/linux/fs.h o/include/linux/fs.h
 
 	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 
+	export KBUILD_MODPOST_WARN=1
 	mkdir modules
 	echo -e 'y\n\ny\n2\nm\n/usr/include/zaptel\nn\nn\n\n\n\n\ny\ny\n\n\n\n' | \
 	bash -x ./Setup drivers \

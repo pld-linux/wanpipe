@@ -24,6 +24,7 @@ Source3:	%{name}1.conf
 Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
+Patch3:		%{name}-include-limits.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	bison
 BuildRequires:	flex
@@ -77,6 +78,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 #ugly speedhack
 mkdir util/wanec_client/tmp
@@ -115,7 +117,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},/etc/{rc.d/init.d,sysconfig},/var/log}
 %{__make} -C util install \
 	WAN_VIRTUAL=$RPM_BUILD_ROOT
 
-install firmware/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/firmware
+install firmware/*.sfm $RPM_BUILD_ROOT%{_datadir}/wanrouter/firmware
 #install util/wancfg/lib/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/wancfg
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter

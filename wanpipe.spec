@@ -29,6 +29,7 @@ URL:		http://www.sangoma.com/
 BuildRequires:	bison
 BuildRequires:	flex
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.22}
+BuildRequires:	libstdc++-devel
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	zaptel-devel >= 1.4.8

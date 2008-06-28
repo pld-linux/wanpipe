@@ -85,6 +85,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 mkdir util/wanec_client/tmp
 cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
 cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
+echo "exit 1" >  patches/sangoma-zaptel-patch.sh
 
 %build
 
@@ -99,8 +100,8 @@ cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
 
 	export KBUILD_MODPOST_WARN=1
 	mkdir modules
-	echo -e 'y\n\ny\n2\nm\n/usr/include/zaptel\nn\nn\n\n\n\n\ny\ny\n\n\n\n' | \
-	bash -x ./Setup drivers \
+	echo -e 'y\n\ny\n2\nm\n/usr/include/zaptel\ny\nn\n\n\n\n\ny\ny\n\n\n\n' | \
+	bash ./Setup drivers \
 	--no-gcc-debug \
 	--with-linux=$PWD/o \
 	--builddir=$PWD/modules

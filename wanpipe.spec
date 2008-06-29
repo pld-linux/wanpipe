@@ -7,7 +7,7 @@
 %undefine	with_dist_kernel
 %endif
 
-%define		rel    0.1
+%define		rel    0.3
 
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
@@ -85,7 +85,9 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 mkdir util/wanec_client/tmp
 cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
 cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
-echo "exit 1" >  patches/sangoma-zaptel-patch.sh
+
+#hack to Native Zaptel HW HDLC Support Detect
+sed -i 's/zaptel-base.c/zaptel.h/' Setup
 
 %build
 
@@ -122,20 +124,31 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},/etc/{rc.d/init.d,sysconfig},/var/log}
 install firmware/*.sfm $RPM_BUILD_ROOT%{_datadir}/wanrouter/firmware
 #install util/wancfg/lib/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/wancfg
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
+#install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
+install samples/wanrouter $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 
 touch $RPM_BUILD_ROOT/var/log/wanrouter
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/kernel/{net/wanrouter,drivers/net/wan}
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/{net/wanrouter,drivers/net/wan} \
+	$RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}
 
 install  modules/lib/modules/*/kernel/net/wanrouter/*.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter
 
+mv $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter-current.ko
+
 install  modules/lib/modules/*/kernel/drivers/net/wan/*.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan
+
+# blacklist kernel module
+cat > $RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}/wanpipe.conf <<'EOF'
+blacklist wanrouter
+alias wanrouter wanrouter-current
+EOF
 %endif
 
 %clean
@@ -181,6 +194,7 @@ fi
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-%{name}
 %defattr(644,root,root,755)
+/etc/modprobe.d/%{_kernel_ver}/wanpipe.conf
 /lib/modules/%{_kernel_ver}/kernel/net/wanrouter/*.ko*
 /lib/modules/%{_kernel_ver}/kernel/drivers/net/wan/*.ko*
 %endif

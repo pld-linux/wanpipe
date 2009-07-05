@@ -1,8 +1,0 @@
---- util/wancfg/lib/adsl_lib.sh~	2003-07-18 20:18:36.000000000 +0000
-+++ util/wancfg/lib/adsl_lib.sh	2004-04-19 11:43:47.829034256 +0000
-@@ -1,4 +1,4 @@
--#!/bins/sh
-+#!/bin/sh
- 
- function adsl_get_std_item () {
- 

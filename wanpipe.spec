@@ -12,12 +12,12 @@
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	3.2.6
+Version:	3.5.8
 Release:	%{rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	d2455d0d4a4f3ff145307637b7a2d135
+# Source0-md5:	3f0cbcba14d9021a12ac340c0ff0dcc9
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -32,7 +32,7 @@ BuildRequires:	flex
 BuildRequires:	libstdc++-devel
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
-BuildRequires:	zaptel-devel >= 1.4.8
+BuildRequires:	dahdi-linux-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -76,18 +76,21 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 
 %prep
 %setup -q 
-%patch0 -p1
-%patch1 -p1
+#%patch0 -p1
+#%patch1 -p1
 %patch2 -p1
-%patch3 -p1
+#%patch3 -p1
 
 #ugly speedhack
-mkdir util/wanec_client/tmp
-cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
-cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
+#mkdir util/wanec_client/tmp
+#cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
+#cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
 
 #hack to Native Zaptel HW HDLC Support Detect
-sed -i 's/zaptel-base.c/zaptel.h/' Setup
+#sed -i 's/zaptel-base.c/zaptel.h/' Setup
+
+sed -i "s#^ARCH=.*#ARCH=\$(shell uname -m)\nEXTRA_FLAGS=-I/usr/include/ncurses -I$PWD/o/include#"  util/Makefile
+sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
 
 %build
 
@@ -102,16 +105,13 @@ sed -i 's/zaptel-base.c/zaptel.h/' Setup
 
 	export KBUILD_MODPOST_WARN=1
 	mkdir modules
-	echo -e 'y\n\ny\n2\nm\n/usr/include/zaptel\ny\nn\n\n\n\n\ny\ny\n\n\n\n' | \
-	bash ./Setup drivers \
-	--no-gcc-debug \
-	--with-linux=$PWD/o \
-	--builddir=$PWD/modules
+	
+	echo -e 'y\nn\n' | ./Setup dahdi --with-linux=$PWD/o  --protocol=TDM --builddir=$PWD/modules --with-zaptel=/usr --no-gcc-debug
 %endif
 
-%{__make} -C util all all_wancfg \
-	CC="%{__cc}" \
-	OPTFLAGS="%{rpmcflags}"
+#%{__make} -C util all all_wancfg \
+#	CC="%{__cc}" \
+#	OPTFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT

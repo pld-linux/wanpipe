@@ -1,24 +1,11 @@
---- wanpipe/Setup.org	2006-09-17 14:54:57.778046000 +0000
-+++ wanpipe/Setup	2006-09-17 14:57:37.596034000 +0000
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- #
- # Setup		WANPIPE WAN Router Installation/Removal Script.
- #
-@@ -3139,15 +3139,6 @@
- 		CONFIG_SMP=YES;  
- 	else	
- 		echo -e "Disabled.\n"
--		eval "uname -a |grep SMP > /dev/null 2> /dev/null"
--		if [ $? -eq 0 ]; then
--			echo
--			echo "   Warning: Current image is configured for SMP"
--			getyn "  Would you like to proceed with installation?"
--			if [ $? -ne 0 ]; then
--				exit 1
--			fi 
--		fi
- 		CONFIG_SMP=NO;
- 	fi
- 
+--- wanpipe-3.5.8/Setup.org	2009-12-13 15:36:22.000000000 +0000
++++ wanpipe-3.5.8/Setup	2009-12-13 15:38:35.000000000 +0000
+@@ -7886,7 +7886,7 @@
+ 				echo "Error: Zaptel source directory not found: $ZAPTEL_INSTALL_DIR";
+ 				exit 1;
+ 			fi
+-			if [ ! -f "$ZAPTEL_INSTALL_DIR/Makefile" ]; then
++			if [ ! -f "$ZAPTEL_INSTALL_DIR/include/dahdi/dahdi_config.h" ]; then
+ 				echo "Error: Invalid zaptel source found in $ZAPTEL_INSTALL_DIR";
+ 				exit 1;
+ 			fi

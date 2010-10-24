@@ -7,17 +7,17 @@
 %undefine	with_dist_kernel
 %endif
 
-%define		rel    0.3
+%define		rel    0.1
 
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	3.5.8
+Version:	3.5.17
 Release:	%{rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	3f0cbcba14d9021a12ac340c0ff0dcc9
+# Source0-md5:	9c12ef6e61d75f6c531c198ed450292c
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -81,15 +81,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 %patch2 -p1
 #%patch3 -p1
 
-#ugly speedhack
-#mkdir util/wanec_client/tmp
-#cp patches/kdrivers/wanec/wanec_iface.h patches/kdrivers/include
-#cp -a patches/kdrivers/wanec/oct6100_api/include/* patches/kdrivers/include
-
-#hack to Native Zaptel HW HDLC Support Detect
-#sed -i 's/zaptel-base.c/zaptel.h/' Setup
-
-sed -i "s#^ARCH=.*#ARCH=\$(shell uname -m)\nEXTRA_FLAGS=-I/usr/include/ncurses -I$PWD/o/include#"  util/Makefile
+sed -i 's#EXTRA_UTIL_FLAGS = #EXTRA_UTIL_FLAGS = -I/usr/include/ncurses #' Makefile
 sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
 
 %build
@@ -104,14 +96,10 @@ sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
 	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 
 	export KBUILD_MODPOST_WARN=1
-	mkdir modules
-	
-	echo -e 'y\nn\n' | ./Setup dahdi --with-linux=$PWD/o  --protocol=TDM --builddir=$PWD/modules --with-zaptel=/usr --no-gcc-debug
-%endif
 
-#%{__make} -C util all all_wancfg \
-#	CC="%{__cc}" \
-#	OPTFLAGS="%{rpmcflags}"
+	%{__make} dahdi DAHDI_DIR=/usr KDIR=$PWD/o KVER=%{_kernel_ver} INSTALLPREFIX=%{buildroot}
+	
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -132,17 +120,14 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 touch $RPM_BUILD_ROOT/var/log/wanrouter
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/{net/wanrouter,drivers/net/wan} \
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter \
 	$RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}
 
-install  modules/lib/modules/*/kernel/net/wanrouter/*.ko \
+install  patches/kdrivers/src/net/*.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter
 
 mv $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter-current.ko
-
-install  modules/lib/modules/*/kernel/drivers/net/wan/*.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan
 
 # blacklist kernel module
 cat > $RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}/wanpipe.conf <<'EOF'
@@ -196,5 +181,4 @@ fi
 %defattr(644,root,root,755)
 /etc/modprobe.d/%{_kernel_ver}/wanpipe.conf
 /lib/modules/%{_kernel_ver}/kernel/net/wanrouter/*.ko*
-/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan/*.ko*
 %endif

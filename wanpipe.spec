@@ -12,12 +12,12 @@
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	3.5.17
+Version:	3.5.18
 Release:	%{rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	9c12ef6e61d75f6c531c198ed450292c
+# Source0-md5:	f72c7536555a3402165d543722da5841
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -83,6 +83,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 
 sed -i 's#EXTRA_UTIL_FLAGS = #EXTRA_UTIL_FLAGS = -I/usr/include/ncurses #' Makefile
 sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
+sed -i 's#MODULE_EXT=".ko"#MODULE_EXT=".ko.gz"#' util/lxdialog/Makefile
 
 %build
 
@@ -113,27 +114,24 @@ install firmware/*.sfm $RPM_BUILD_ROOT%{_datadir}/wanrouter/firmware
 #install util/wancfg/lib/* $RPM_BUILD_ROOT%{_datadir}/wanrouter/wancfg
 
 #install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
-install samples/wanrouter $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
+
+sed 's#MODULE_EXT=".ko"#MODULE_EXT=".ko.gz"#' samples/wanrouter > $RPM_BUILD_ROOT/etc/rc.d/init.d/wanrouter
+ln -s /etc/rc.d/init.d/wanrouter $RPM_BUILD_ROOT/%{_sbindir}/wanrouter
+
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/wanrouter
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 
 touch $RPM_BUILD_ROOT/var/log/wanrouter
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter \
-	$RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/{net/wanrouter,drivers/net/wan}
 
-install  patches/kdrivers/src/net/*.ko \
+install  patches/kdrivers/src/net/{wanec,af_wanpipe,wanrouter}.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter
 
-mv $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter/wanrouter-current.ko
+install  patches/kdrivers/src/net/{sdladrv,wanpipe_syncppp,wanpipe,wan_aften}.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan
 
-# blacklist kernel module
-cat > $RPM_BUILD_ROOT/etc/modprobe.d/%{_kernel_ver}/wanpipe.conf <<'EOF'
-blacklist wanrouter
-alias wanrouter wanrouter-current
-EOF
 %endif
 
 %clean
@@ -171,14 +169,12 @@ fi
 %files cfgtools
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/cfgft1
-%attr(755,root,root) %{_sbindir}/wancfg
-%attr(755,root,root) %{_sbindir}/wanpipe_ft1exec
-%attr(755,root,root) %{_sbindir}/wanpipe_lxdialog
+%attr(755,root,root) %{_sbindir}/wan*
 %{_datadir}/wanrouter/wancfg
 
 %if %{with kernel}
 %files -n kernel%{_alt_kernel}-%{name}
 %defattr(644,root,root,755)
-/etc/modprobe.d/%{_kernel_ver}/wanpipe.conf
 /lib/modules/%{_kernel_ver}/kernel/net/wanrouter/*.ko*
+/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan/*.ko*
 %endif

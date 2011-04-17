@@ -25,11 +25,16 @@ Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
 Patch3:		%{name}-include-limits.patch
+Patch4:		%{name}-kbuild.patch
+Patch5:		%{name}-refcnt.patch
 URL:		http://www.sangoma.com/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.22}
 BuildRequires:	libstdc++-devel
+BuildRequires:	libtool
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
 BuildRequires:	dahdi-linux-devel
@@ -75,32 +80,39 @@ This package contains WANPIPE module for Linux.
 Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 
 %prep
-%setup -q 
+%setup -q
 #%patch0 -p1
 #%patch1 -p1
 %patch2 -p1
 #%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 sed -i 's#EXTRA_UTIL_FLAGS = #EXTRA_UTIL_FLAGS = -I/usr/include/ncurses #' Makefile
 sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
 sed -i 's#MODULE_EXT=".ko"#MODULE_EXT=".ko.gz"#' util/lxdialog/Makefile
+sed -i 's/libstelephony\.cpp//; s#libstelephony_la_SOURCES *=#libstelephony_la_SOURCES = libstelephony.cpp#' api/libstelephony/Makefile.am
+sed -i '/lib_LIBRARIES/d; /libstelephony_a_CXXFLAGS/d' -i api/libstelephony/Makefile.am
+#echo 'EXTRA_CFLAGS += -D__LINUX__ -I$(HOMEDIR)/patches/kdrivers/include' >> patches/kdrivers/src/net/Makefile
+#grep "PRODUCT_DEFINES" Makefile >> patches/kdrivers/src/net/Makefile
 
 %build
+cd api/libstelephony
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__automake}
+cd ../..
+
+%{__make} all_kmod_dahdi all_util all_lib \
+	DAHDI_DIR=/usr \
+	INSTALLPREFIX=%{buildroot}
 
 %if %{with kernel}
-	cfg=%{!?with_dist_kernel:non}dist
-	install -d o/include/{linux,config}
-	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
-
-	%{__make} -j1 -C %{_kernelsrcdir} O=$PWD/o prepare scripts
-
-	export KBUILD_MODPOST_WARN=1
-
-	%{__make} dahdi DAHDI_DIR=/usr KDIR=$PWD/o KVER=%{_kernel_ver} INSTALLPREFIX=%{buildroot}
-	
+echo "include $(pwd)/Makefile.kbuild" >> patches/kdrivers/src/net/Makefile
+%build_kernel_modules -C patches/kdrivers/src/net -m {af_wanpipe,sdladrv,wanrouter,wanpipe,wanpipe_syncppp,wanec,wan_aften}
 %endif
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -124,14 +136,8 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}
 touch $RPM_BUILD_ROOT/var/log/wanrouter
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/{net/wanrouter,drivers/net/wan}
-
-install  patches/kdrivers/src/net/{wanec,af_wanpipe,wanrouter}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/net/wanrouter
-
-install  patches/kdrivers/src/net/{sdladrv,wanpipe_syncppp,wanpipe,wan_aften}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wan
-
+%install_kernel_modules -m patches/kdrivers/src/net/{wanec,af_wanpipe,wanrouter} -d kernel/net/wanrouter
+%install_kernel_modules -m patches/kdrivers/src/net/{sdladrv,wanpipe_syncppp,wanpipe,wan_aften} -d kernel/drivers/net/wan
 %endif
 
 %clean

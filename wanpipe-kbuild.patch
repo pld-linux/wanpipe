@@ -1,0 +1,15 @@
+--- wanpipe-3.5.20/Makefile~	2011-04-17 15:17:04.192510763 +0200
++++ wanpipe-3.5.20/Makefile	2011-04-17 15:24:44.709166444 +0200
+@@ -199,7 +199,10 @@
+ 
+ #Build only kernel modules
+-all_kmod_dahdi:  _checkzap _checksrc _cleanoldwanpipe _check_kver
+-	$(MAKE) KBUILD_VERBOSE=$(KBUILD_VERBOSE) -C $(KDIR) SUBDIRS=$(WAN_DIR) EXTRA_FLAGS="$(EXTRA_CFLAGS) $(DAHDI_CFLAGS) $(shell cat ./patches/kfeatures)" ZAPDIR=$(ZAPDIR_PRIV) ZAPHDLC=$(ZAPHDLC_PRIV) HOMEDIR=$(PWD) modules  
++all_kmod_dahdi:  _checkzap
++	echo "EXTRA_FLAGS = $(EXTRA_CFLAGS) $(DAHDI_CFLAGS) $(shell cat ./patches/kfeatures)" >> Makefile.kbuild
++	echo "ZAPDIR = $(ZAPDIR_PRIV)" >> Makefile.kbuild
++	echo "ZAPHDLC = $(ZAPHDLC_PRIV)" >> Makefile.kbuild
++	echo "HOMEDIR = $(PWD)" >> Makefile.kbuild
+ 
+ all_kmod:  _checksrc _cleanoldwanpipe _check_kver
+ 	$(MAKE) KBUILD_VERBOSE=$(KBUILD_VERBOSE) -C $(KDIR) SUBDIRS=$(WAN_DIR) EXTRA_FLAGS="$(EXTRA_CFLAGS) $(shell cat ./patches/kfeatures)" ZAPDIR= ZAPHDLC= HOMEDIR=$(PWD) modules  

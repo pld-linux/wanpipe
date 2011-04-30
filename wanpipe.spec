@@ -31,13 +31,14 @@ URL:		http://www.sangoma.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
+BuildRequires:	dahdi-linux-devel
 BuildRequires:	flex
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.22}
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool
 BuildRequires:	ncurses-devel >= 5.2
 BuildRequires:	rpmbuild(macros) >= 1.379
-BuildRequires:	dahdi-linux-devel
+BuildRequires:	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -93,8 +94,8 @@ sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
 sed -i 's#MODULE_EXT=".ko"#MODULE_EXT=".ko.gz"#' util/lxdialog/Makefile
 sed -i 's/libstelephony\.cpp//; s#libstelephony_la_SOURCES *=#libstelephony_la_SOURCES = libstelephony.cpp#' api/libstelephony/Makefile.am
 sed -i '/lib_LIBRARIES/d; /libstelephony_a_CXXFLAGS/d' -i api/libstelephony/Makefile.am
-#echo 'EXTRA_CFLAGS += -D__LINUX__ -I$(HOMEDIR)/patches/kdrivers/include' >> patches/kdrivers/src/net/Makefile
-#grep "PRODUCT_DEFINES" Makefile >> patches/kdrivers/src/net/Makefile
+
+sed "1a\include $(pwd)/Makefile.kbuild" -i patches/kdrivers/src/net/Makefile
 
 %build
 cd api/libstelephony
@@ -109,7 +110,6 @@ cd ../..
 	INSTALLPREFIX=%{buildroot}
 
 %if %{with kernel}
-echo "include $(pwd)/Makefile.kbuild" >> patches/kdrivers/src/net/Makefile
 %build_kernel_modules -C patches/kdrivers/src/net -m {af_wanpipe,sdladrv,wanrouter,wanpipe,wanpipe_syncppp,wanec,wan_aften}
 %endif
 

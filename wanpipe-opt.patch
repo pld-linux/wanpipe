@@ -1,82 +1,70 @@
---- wanpipe/util/misc/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
-+++ wanpipe/util/misc/Makefile	2004-04-09 18:39:26.032529856 +0200
-@@ -15,7 +15,8 @@
- WAN_VIRTUAL=
+--- wanpipe-7.0.0/util/misc/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/misc/Makefile	2013-03-10 19:56:46.015102862 +0100
+@@ -20,7 +20,8 @@
+ endif
  
  # Tools options.
--CFLAGS  = -Wall -O2 -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) $(HOSTCFLAGS)
-+OPTFLAGS=-O2
-+CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) $(HOSTCFLAGS)
- 
+-CFLAGS  = -Wall -O2 -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) -I$(WANINCDIR) $(HOSTCFLAGS)
++OPTFLAGS = -O2
++CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I$(SYSINC) -I$(WANINCDIR) $(HOSTCFLAGS)
  
  ####### RULES ################################################################
---- wanpipe/util/wanconfig/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
-+++ wanpipe/util/wanconfig/Makefile	2004-04-09 18:40:07.506224896 +0200
-@@ -17,7 +17,8 @@
- WAN_VIRTUAL=
+ 
+--- wanpipe-7.0.0/util/wanconfig/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/wanconfig/Makefile	2013-03-10 19:55:12.731773439 +0100
+@@ -23,7 +23,8 @@
  
  # Tools options.
--CFLAGS  = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -I../../patches/kdrivers/include -D_DEBUG_=$(DEBUG)
+ SRCS=wanconfig.c wanconfig_hwec.c  
+-CFLAGS = -Wall -O2 -D$(OS_TYPE) -I$(SYSINC) -D_DEBUG_=$(DEBUG)
 +OPTFLAGS=-O2
-+CFLAGS  = -Wall $(OPTFLAGS) -D$(OS_TYPE) -I/usr/include/ncurses -I../../patches/kdrivers/include -D_DEBUG_=$(DEBUG)
++CFLAGS = -Wall $(OPTFLAGS) -D$(OS_TYPE) -I$(SYSINC) -D_DEBUG_=$(DEBUG)
+ CFLAGS += -DCONFIG_PRODUCT_WANPIPE_AFT_BRI -DCONFIG_PRODUCT_WANPIPE_USB -I../libsangoma/wanec
+ CFLAGS += -I../../patches/kdrivers/include -I$(SYSINC)
+ CFLAGS += -I$(WANECDIR)/oct6100_api/include
+--- wanpipe-7.0.0/util/wanpipemon/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/wanpipemon/Makefile	2013-03-10 19:57:27.298434463 +0100
+@@ -34,11 +34,12 @@
  
- CFLAGS += -DWAN_HWEC
- 
---- wanpipe/util/wanpipemon/Makefile.orig	2004-01-15 17:10:28.000000000 +0100
-+++ wanpipe/util/wanpipemon/Makefile	2004-04-09 18:41:11.266531856 +0200
-@@ -12,7 +12,7 @@
- 
- PROD=wanpipemon
- 
--SYSINC=/lib/modules/$(shell uname -r)/build/include
-+HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
- 
- WAN_VIRTUAL=
- LXDIR=../lxdialog
-@@ -27,7 +27,8 @@
+ CC = gcc 
  CPP = gcc -E
++OPTFLAGS = -O2
  CFLAGS = -Wall -Wstrict-prototypes 
- CFLAGS += $(EXTRA_FLAGS)
--CFLAGS += -I$(SYSINC) -D$(OS_TYPE) -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG)
-+OPTFLAGS=-O2                                                                                                                     
-+CFLAGS = $(OPTFLAGS) -fomit-frame-pointer -DLOCALE -D$(OS_TYPE) -I../ft1 -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)  
+ CFLAGS += $(EXTRA_FLAGS) $(PROTOCOL_DEFS)
+ CFLAGS += $(GLOBAL_CFLAGS)
+ CFLAGS +=  -D$(OS_TYPE) -I../libsangoma -I../libsangoma/wanec -I$(WLINC) -I$(WEC) -I$(WECOCT) -I$(WINC)
+-CFLAGS += -I$(SYSINC) -I$(SYSINC)/oct6100_api -I$(SYSINC)/oct6100_api/oct6100api -I../ft1 -O2 -fomit-frame-pointer -DLOCALE -D_DEBUG_=$(DEBUG)
++CFLAGS += -I$(SYSINC) -I$(SYSINC)/oct6100_api -I$(SYSINC)/oct6100_api/oct6100api -I../ft1 -fomit-frame-pointer $(OPTFLAGS) -DLOCALE -D_DEBUG_=$(DEBUG)
  WAN_VIRTUAL=
  
  
-
---- wanpipe/util/sdladump/Makefile.orig	2003-07-18 22:18:35.000000000 +0200
-+++ wanpipe/util/sdladump/Makefile	2004-04-09 18:39:45.744533176 +0200
-@@ -13,7 +13,8 @@
- SYSINC	= /usr/src/linux/include
+--- wanpipe-7.0.0/util/sdladump/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/sdladump/Makefile	2013-03-10 19:57:59.671766435 +0100
+@@ -15,7 +15,8 @@
+ endif
  
  # Tools options.
--CFLAGS  = -D__LINUX__ -I$(SYSINC) -Wall -O2  -D_DEBUG_=$(DEBUG) 
-+OPTFLAGS=-O2
-+CFLAGS  = -D__LINUX__ -I/usr/include/ncurses -I../../patches/kdrivers/include -Wall $(OPTFLAGS)  -D_DEBUG_=$(DEBUG) 
+-CFLAGS  = -D__LINUX__ -I$(SYSINC) -Wall -O2  -D_DEBUG_=$(DEBUG) $(EXTRA_FLAGS) 
++OPTFLAGS = -O2
++CFLAGS  = -D__LINUX__ -I$(SYSINC) -Wall $(OPTFLAGS)  -D_DEBUG_=$(DEBUG) $(EXTRA_FLAGS) 
  
  
  ####### RULES ################################################################
---- wanpipe/util/ft1/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
-+++ wanpipe/util/ft1/Makefile	2004-04-09 18:38:37.559898816 +0200
-@@ -11,10 +11,12 @@
- DEBUG	= 2
- 
- # Project file paths.
--SYSINC=/lib/modules/$(shell uname -r)/build/include
-+HOSTCFLAGS=-I../../patches/kdrivers/include -I/usr/include/ncurses
+--- wanpipe-7.0.0/util/ft1/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/ft1/Makefile	2013-03-10 19:58:40.768431374 +0100
+@@ -22,7 +22,8 @@
+ EXTRA_FLAGS=
  
  # Tools options.
--CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) -I../../patches/kdrivers/include 
-+OPTFLAGS=-O2
-+CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -D$(OS_TYPE) -D_DEBUG_=$(DEBUG) $(HOSTCFLAGS)
-+
+-CFLAGS  = -D__LINUX__ -Wall -O2 -D_GNUC_ -I$(WANINCDIR) -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG)  
++OPTFLAGS = -O2
++CFLAGS  = -D__LINUX__ -Wall $(OPTFLAGS) -D_GNUC_ -I$(WANINCDIR) -I$(SYSINC) -D$(OS_TYPE) -D_DEBUG_=$(DEBUG)  
  LIBS = -lncurses
  
- ####### RULES ################################################################
---- wanpipe/util/bwm/Makefile.orig	2003-10-08 17:38:05.000000000 +0200
-+++ wanpipe/util/bwm/Makefile	2004-04-09 18:38:09.166215312 +0200
-@@ -1,5 +1,8 @@
-+CC=gcc
+ CFLAGS += $(EXTRA_FLAGS)
+--- wanpipe-7.0.0/util/bwm/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
++++ wanpipe-7.0.0/util/bwm/Makefile	2013-03-10 19:59:10.858430099 +0100
+@@ -1,5 +1,7 @@
 +OPTFLAGS=-O2
 +
  all: bwm.c
@@ -84,33 +72,16 @@
 +	$(CC) $(CFLAGS) $(OPTFLAGS) -Wall bwm.c -o wpbwm
  
  clean:
- 	rm wpbwm
---- wanpipe/util/lxdialog/Makefile.orig	2003-07-18 22:18:36.000000000 +0200
-+++ wanpipe/util/lxdialog/Makefile	2004-04-09 18:39:10.810843904 +0200
-@@ -1,15 +1,14 @@
- CC = gcc 
- CPP = gcc -E
+ 	rm -f wpbwm
+--- wanpipe-7.0.0/util/lxdialog/Makefile.orig	2013-03-10 19:10:00.295220605 +0100
++++ wanpipe-7.0.0/util/lxdialog/Makefile	2013-03-10 20:00:40.318426412 +0100
+@@ -3,7 +3,8 @@
  #Will be overwritten by ./Setup
--SYSINC=/lib/modules/$(shell uname -r)/build/include
+ SYSINC=/lib/modules/$(shell uname -r)/build/include
  
--CFLAGS = -Wall -Wstrict-prototypes -I$(SYSINC) -O2 -fomit-frame-pointer -DLOCALE 
-+OPTFLAGS=-O2 -fomit-frame-pointer                                              
-+CFLAGS = -Wall -Wstrict-prototypes $(OPTFLAGS) -DLOCALE -I/usr/include/ncurses
+-CFLAGS = -D__LINUX__ -Wall -Wstrict-prototypes -I$(SYSINC) -O2 -fomit-frame-pointer -DLOCALE 
++OPTFLAGS = -O2
++CFLAGS = -D__LINUX__ -Wall -Wstrict-prototypes -I$(SYSINC) -fomit-frame-pointer $(OPTFLAGS) -DLOCALE 
  LDFLAGS = -s -L .
  LDLIBS = -lncurses
  WAN_VIRTUAL=
- 
- CFLAGS += -I$(ASTBROOT)/include -DCURSES_LOC="<ncurses.h>"
--
- #ifeq (/usr/include/ncurses/ncurses.h, $(wildcard /usr/include/ncurses/ncurses.h))
- #        CFLAGS += -I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"
- #else
---- wanpipe/util/Makefile.orig	2007-03-22 00:27:29.000000000 +0000
-+++ wanpipe/util/Makefile	2007-10-10 22:03:32.603992707 +0000
-@@ -1,5 +1,5 @@
- PWD=$(shell pwd)
--SYSINC=$(PWD)/../patches/kdrivers/include
-+SYSINC="../../patches/kdrivers/include -I/usr/include/ncurses"
- WAN_VIRTUAL=$(PREFIX)
- WANINCDIR=/usr/include/wanpipe
- ARCH=$(shell uname -m)

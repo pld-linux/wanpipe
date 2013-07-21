@@ -22,14 +22,14 @@
  CFLAGS += -DCONFIG_PRODUCT_WANPIPE_AFT_BRI -DCONFIG_PRODUCT_WANPIPE_USB -I../libsangoma/wanec
  CFLAGS += -I../../patches/kdrivers/include -I$(SYSINC)
  CFLAGS += -I$(WANECDIR)/oct6100_api/include
---- wanpipe-7.0.0/util/wanpipemon/Makefile.orig	2008-08-01 15:00:00.000000000 +0200
-+++ wanpipe-7.0.0/util/wanpipemon/Makefile	2013-03-10 19:57:27.298434463 +0100
+--- wanpipe-7.0.5/util/wanpipemon/Makefile.orig	2013-07-21 20:28:26.970321129 +0200
++++ wanpipe-7.0.5/util/wanpipemon/Makefile	2013-07-21 20:29:16.680319043 +0200
 @@ -34,11 +34,12 @@
  
  CC = gcc 
  CPP = gcc -E
 +OPTFLAGS = -O2
- CFLAGS = -Wall -Wstrict-prototypes 
+ CFLAGS = -Wall  -fno-strict-aliasing -Wstrict-prototypes 
  CFLAGS += $(EXTRA_FLAGS) $(PROTOCOL_DEFS)
  CFLAGS += $(GLOBAL_CFLAGS)
  CFLAGS +=  -D$(OS_TYPE) -I../libsangoma -I../libsangoma/wanec -I$(WLINC) -I$(WEC) -I$(WECOCT) -I$(WINC)

@@ -12,12 +12,12 @@
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	7.0.0
+Version:	7.0.5
 Release:	%{rel}
 License:	GPL
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	0602bf8a632312019e092f7de23caa9a
+# Source0-md5:	bb058a15054b5d252bcf703adb8a3d5a
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf

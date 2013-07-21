@@ -14,7 +14,7 @@ Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
 Version:	7.0.5
 Release:	%{rel}
-License:	GPL
+License:	GPL v2+, partially BSD
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
 # Source0-md5:	bb058a15054b5d252bcf703adb8a3d5a
@@ -26,7 +26,7 @@ Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
 Patch3:		%{name}-kbuild.patch
 URL:		http://www.sangoma.com/
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	dahdi-linux-devel

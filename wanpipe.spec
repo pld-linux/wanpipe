@@ -12,12 +12,12 @@
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	7.0.5
+Version:	7.0.8
 Release:	%{rel}
 License:	GPL v2+, partially BSD
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	bb058a15054b5d252bcf703adb8a3d5a
+# Source0-md5:	fe2d6a2c1aa63d2024beeabd9adb4e8e
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -25,6 +25,7 @@ Patch0:		%{name}-cfgtools.patch
 Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
 Patch3:		%{name}-kbuild.patch
+Patch4:		%{name}-format.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -120,6 +121,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 sed -i 's#EXTRA_UTIL_FLAGS = #EXTRA_UTIL_FLAGS = -I/usr/include/ncurses #' Makefile
 sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
@@ -241,9 +243,7 @@ fi
 %attr(755,root,root) %{_sbindir}/wan_ec_client
 %attr(755,root,root) %{_sbindir}/wan_plxup
 %attr(755,root,root) %{_sbindir}/wancfg_*
-%attr(755,root,root) %{_sbindir}/wanconfig
 %attr(755,root,root) %{_sbindir}/wanpipe_lxdialog
-%attr(755,root,root) %{_sbindir}/wanpipemon
 %attr(755,root,root) %{_sbindir}/wanpipemon_legacy
 %{_datadir}/wanrouter/wancfg
 

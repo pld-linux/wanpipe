@@ -12,12 +12,12 @@
 Summary:	WAN routing package for Sangoma cards
 Summary(pl.UTF-8):	Pakiet do rutingu WAN dla kart Sangoma
 Name:		wanpipe
-Version:	7.0.8
+Version:	7.0.10
 Release:	%{rel}
 License:	GPL v2+, partially BSD
 Group:		Applications/System
 Source0:	ftp://ftp.sangoma.com/linux/current_wanpipe/%{name}-%{version}.tgz
-# Source0-md5:	fe2d6a2c1aa63d2024beeabd9adb4e8e
+# Source0-md5:	ee1f34dbbf0e4ee340813b33d5f12de3
 Source1:	wanrouter.init
 Source2:	wanrouter.sysconfig
 Source3:	%{name}1.conf
@@ -26,6 +26,7 @@ Patch1:		%{name}-opt.patch
 Patch2:		%{name}-setup.patch
 Patch3:		%{name}-kbuild.patch
 Patch4:		%{name}-format.patch
+Patch5:		%{name}-linux3.patch
 URL:		http://www.sangoma.com/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -122,6 +123,7 @@ Ten pakiet zawiera moduł WANPIPE dla Linuksa.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 sed -i 's#EXTRA_UTIL_FLAGS = #EXTRA_UTIL_FLAGS = -I/usr/include/ncurses #' Makefile
 sed -i 's#<ncurses.h>#<ncurses/ncurses.h>#' util/lxdialog/Makefile
